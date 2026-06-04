@@ -1,0 +1,1064 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<link rel="icon" type="image/png" href="Logo.jpg">
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Director CLC - UDEP</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<script src="https://unpkg.com/lucide@latest"></script>
+
+<style>
+/* ─── DESIGN TOKENS ─────────────────────────────────────────── */
+:root {
+  --udep-navy:   #002855;
+  --udep-blue:   #004B93;
+  --udep-red:    #C8102E;
+  --udep-gold:   #E8A020;
+  --bg:          #F0F4F9;
+  --surface:     #FFFFFF;
+  --surface2:    #EBF0F8;
+  --text:        #1A2437;
+  --text-muted:  #6B7A99;
+  --border:      #D0DAEA;
+  --green:       #0E7A4E;
+  --green-bg:    #DCFCE7;
+  --amber:       #B45309;
+  --amber-bg:    #FEF3C7;
+  --red:         #C8102E;
+  --red-bg:      #FEE2E2;
+  --radius:      12px;
+  --shadow:      0 2px 12px rgba(0,40,85,.10);
+  --shadow-lg:   0 8px 32px rgba(0,40,85,.16);
+}
+
+/* ─── RESET & TYPOGRAPHY ────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 15px; }
+body { font-family: 'Outfit', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+button { cursor: pointer; font-family: inherit; }
+button:disabled { opacity: 0.5; cursor: not-allowed !important; }
+input, select, textarea { font-family: inherit; }
+
+/* ─── LAYOUT ─────────────────────────────────────────────────── */
+.app { display: flex; min-height: 100vh; }
+.sidebar {
+  width: 240px; min-width: 240px;
+  background: var(--udep-navy);
+  display: flex; flex-direction: column;
+  padding: 24px 0;
+  position: fixed; top: 0; left: 0; bottom: 0;
+  z-index: 100;
+}
+.sidebar-logo {
+  padding: 0 20px 24px; border-bottom: 1px solid rgba(255,255,255,.08);
+  display: flex; flex-direction: column; gap: 4px;
+}
+.logo-badge { background: var(--udep-red); color: #fff; font-weight: 800; font-size: 18px; padding: 6px 12px; border-radius: 8px; display: inline-block; width: fit-content; }
+.logo-sub { color: rgba(255,255,255,.55); font-size: 11px; font-weight: 500; letter-spacing: .8px; text-transform: uppercase; padding-left: 2px; margin-top: 6px; }
+.sidebar-nav { padding: 16px 12px; flex: 1; display: flex; flex-direction: column; gap: 10px; }
+.nav-item {
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; padding: 20px 12px;
+  color: rgba(255,255,255,.60); font-size: 13px; font-weight: 600; border-radius: 10px; background: rgba(255,255,255,.05);
+  border: 1.5px solid rgba(255,255,255,.07); cursor: pointer; transition: all .18s; text-align: center;
+}
+.nav-item:hover { background: rgba(255,255,255,.10); color: #fff; }
+.nav-item.active { background: rgba(255,255,255,.17); color: #fff; border-color: var(--udep-gold); box-shadow: 0 2px 12px rgba(0,0,0,.25); }
+.nav-item svg { width: 22px; height: 22px; flex-shrink: 0; }
+.sidebar-bottom { padding: 16px 20px 0; border-top: 1px solid rgba(255,255,255,.08); }
+.user-chip { display: flex; align-items: center; gap: 10px; }
+.user-avatar { width: 34px; height: 34px; border-radius: 50%; background: var(--udep-gold); display: flex; align-items: center; justify-content: center; color: var(--udep-navy); font-weight: 800; font-size: 13px; flex-shrink: 0; }
+.user-info { flex: 1; overflow: hidden; }
+.user-name { font-size: 13px; font-weight: 600; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.user-role { font-size: 11px; color: rgba(255,255,255,.45); }
+
+.main { flex: 1; margin-left: 240px; display: flex; flex-direction: column; min-height: 100vh; }
+.topbar { background: var(--surface); border-bottom: 1px solid var(--border); padding: 0 32px; height: 60px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 50; }
+.topbar-title { font-size: 16px; font-weight: 700; color: var(--udep-navy); }
+.content { padding: 28px 32px; flex: 1; }
+
+/* ─── UI COMPONENTS ──────────────────────────────────────────── */
+.page-title { font-size: 22px; font-weight: 800; color: var(--udep-navy); margin-bottom: 4px; }
+.page-sub { font-size: 13px; color: var(--text-muted); margin-bottom: 24px; }
+.card { background: var(--surface); border-radius: var(--radius); box-shadow: var(--shadow); border: 1px solid var(--border); padding: 22px; margin-bottom: 20px; }
+
+.grid5 { display: grid; grid-template-columns: repeat(5, 1fr); gap: 20px; margin-bottom: 24px; }
+.grid6 { display: grid; grid-template-columns: repeat(6, 1fr); gap: 16px; margin-bottom: 24px; }
+.stat-card { background: var(--surface); border-radius: var(--radius); border: 1px solid var(--border); padding: 20px; display: flex; flex-direction: column; gap: 8px; box-shadow: var(--shadow); }
+.stat-label { font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: .5px; }
+.stat-value { font-size: 32px; font-weight: 800; color: var(--udep-navy); line-height: 1; }
+
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 7px; padding: 9px 18px; border-radius: 8px; border: none; font-size: 13px; font-weight: 600; transition: all .15s; }
+.btn-primary { background: var(--udep-navy); color: #fff; }
+.btn-primary:hover:not(:disabled) { background: var(--udep-blue); }
+.btn-green { background: var(--green); color: #fff; }
+.btn-green:hover { opacity: .9; }
+.btn-red { background: var(--udep-red); color: #fff; }
+.btn-amber { background: var(--amber); color: #fff; }
+.btn-ghost { background: transparent; color: var(--text-muted); border: 1px solid var(--border); }
+.btn-ghost:hover:not(:disabled) { background: var(--bg); color: var(--text); }
+.btn-sm { padding: 6px 12px; font-size: 12px; }
+.btn svg { width: 15px; height: 15px; }
+
+.badge { display: inline-flex; align-items: center; gap: 5px; padding: 4px 10px; border-radius: 99px; font-size: 11px; font-weight: 700; }
+.badge-green { background: var(--green-bg); color: var(--green); }
+.badge-amber { background: var(--amber-bg); color: var(--amber); }
+.badge-red { background: var(--red-bg); color: var(--red); }
+.badge-blue { background: #DBEAFE; color: #1D4ED8; }
+.badge-purple { background: #F3E8FF; color: #7E22CE; }
+.badge-gray { background: #F1F5F9; color: #475569; }
+.badge .dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+
+/* ─── TABLE ──────────────────────────────────────────────────── */
+table { width: 100%; border-collapse: collapse; }
+th { background: var(--bg); padding: 12px 14px; font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--text-muted); text-align: left; border-bottom: 1px solid var(--border); }
+td { padding: 14px; font-size: 13px; border-bottom: 1px solid var(--surface2); vertical-align: middle; }
+tr:hover td { background: #F8FAFC; }
+.table-actions { display: flex; gap: 6px; flex-wrap: wrap; align-items: center;}
+
+.filter-bar { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 16px; align-items: center; justify-content: space-between; }
+
+.form-group { display: flex; flex-direction: column; gap: 6px; margin-bottom: 10px; }
+.form-label { font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: .5px; }
+.form-input { padding: 8px 12px; border: 1.5px solid var(--border); border-radius: 8px; font-size: 13px; outline: none; background: #fff;}
+.form-input:focus { border-color: var(--udep-blue); }
+textarea.form-input { resize: vertical; min-height: 80px; width: 100%; }
+
+/* ─── MODALS ─────────────────────────────────────────────────── */
+.modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.5); z-index: 200; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity .2s; }
+.modal-overlay.open { opacity: 1; pointer-events: all; }
+.modal { background: var(--surface); border-radius: 16px; box-shadow: var(--shadow-lg); width: 100%; max-width: 600px; padding: 28px; transform: translateY(10px); transition: transform .2s; max-height: 90vh; overflow-y: auto; }
+.modal.modal-lg { max-width: 1000px; }
+.modal-overlay.open .modal { transform: translateY(0); }
+.modal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+.modal-title { font-size: 18px; font-weight: 800; color: var(--udep-navy); }
+.modal-close { background: none; border: none; color: var(--text-muted); cursor: pointer; padding: 4px; }
+.alert { padding: 14px 16px; border-radius: 10px; display: flex; gap: 12px; font-size: 13px; margin-bottom: 16px; }
+.alert-blue { background: #DBEAFE; border: 1px solid #93C5FD; color: #1E3A8A; }
+.alert-amber { background: var(--amber-bg); border: 1px solid #FCD34D; color: #78350F; }
+.hidden { display: none !important; }
+
+/* ─── SPLIT VIEW & LISTS ────────────────────────────────────── */
+.split-layout { display: grid; grid-template-columns: 1fr 1.2fr; gap: 24px; min-height: 500px; }
+.split-left { display: flex; flex-direction: column; }
+.split-right { display: flex; flex-direction: column; border: 1px solid var(--border); border-radius: 12px; background: var(--bg); overflow: hidden; }
+.pdf-viewer { width: 100%; height: 100%; border: none; min-height: 500px; }
+.pdf-header { background: var(--surface2); padding: 8px 12px; font-size: 12px; font-weight: 600; color: var(--text-muted); display: flex; align-items: center; gap: 8px; border-bottom: 1px solid var(--border); }
+
+.detail-list { list-style: none; padding: 0; margin: 0; }
+.detail-list li { display: flex; flex-direction: column; padding: 10px 0; border-bottom: 1px solid var(--surface2); }
+.detail-list li:last-child { border-bottom: none; }
+.detail-list .val { font-size: 14px; font-weight: 600; color: var(--text); margin-top: 4px; }
+
+/* ─── TOAST ───────────────────────────────────────────────────── */
+#toast-container { position: fixed; bottom: 24px; right: 24px; z-index: 999; display: flex; flex-direction: column; gap: 8px; }
+.toast { background: var(--udep-navy); color: #fff; padding: 12px 18px; border-radius: 10px; font-size: 13px; font-weight: 500; box-shadow: var(--shadow-lg); display: flex; align-items: center; gap: 10px; animation: slideIn .25s ease; }
+@keyframes slideIn { from { transform: translateX(30px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+
+/* ─── FOLDER PREVIEW ────────────────────────────────────────── */
+.doc-preview { background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 16px; display: flex; align-items: center; gap: 16px; margin-bottom: 20px; }
+.doc-icon { width: 48px; height: 48px; background: #fff; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: var(--udep-red); box-shadow: 0 2px 4px rgba(0,0,0,.05); }
+.doc-info { flex: 1; }
+.doc-name { font-size: 14px; font-weight: 700; color: var(--udep-navy); }
+.doc-meta { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
+</style>
+</head>
+<body>
+
+<div class="app">
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <span class="logo-badge">UDEP</span>
+      <span class="logo-sub">Director CLC</span>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-item active" id="navBandeja" onclick="showTab('bandeja')"><i data-lucide="inbox"></i><span>Bandeja de Entrada</span></div>
+      <div class="nav-item" id="navBuscar" onclick="showTab('buscar')"><i data-lucide="search"></i><span>Buscar Alumnos</span></div>
+    </nav>
+    <div class="sidebar-bottom">
+      <div class="user-chip">
+        <div class="user-avatar">AG</div>
+        <div class="user-info">
+          <div class="user-name">Angela Flores</div>
+          <div class="user-role">Director CLC</div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <div class="main">
+    <div class="topbar">
+      <span class="topbar-title">Panel de Control - Director</span>
+    </div>
+
+    <div class="content">
+      <!-- ═══ TAB: BANDEJA DE ENTRADA ═══ -->
+      <div id="tabBandeja">
+      <div class="page-title">Gestión de Solicitudes CLC</div>
+      <div class="page-sub">Revisión de documentos y gestión de pagos.</div>
+
+      <div class="grid6" id="statsContainer"></div>
+
+      <div class="card">
+        <div class="filter-bar">
+          <div style="display: flex; gap: 12px; flex-wrap: wrap; align-items: center;">
+            <select class="form-input" id="filterPrograma" onchange="renderTable()" style="width: auto; min-width: 150px; cursor: pointer;">
+              <option value="Todos">Todos los Programas</option>
+              <option value="Ingeniería Mecánico Eléctrico">Ingeniería Mecánico Eléctrico</option>
+              <option value="Arquitectura">Arquitectura</option>
+              <option value="Ingeniería Civil">Ingeniería Civil</option>
+              <option value="Ingeniería Industrial y de Sistemas">Ingeniería Industrial y de Sistemas</option>
+              <option value="Ingeniería de Software e Inteligencia Artificial">Ing. de Software e IA</option>
+            </select>
+            <select class="form-input" id="filterEstado" onchange="renderTable()" style="width: auto; min-width: 150px; cursor: pointer;">
+              <option value="Todos">Todos los Estados</option>
+              <option value="formato">Documentos por Validar</option>
+              <option value="pago_revision">Espera de Pago</option>
+              <option value="subsanacion">Esperando Subsanación</option>
+              <option value="rechazado">Rechazado</option>
+              <option value="direccion">Aprobado</option>
+            </select>
+          </div>
+          <div>
+            <input type="text" class="form-input" id="searchBox" style="width: 250px;" placeholder="Buscar alumno o código..." onkeyup="renderTable()">
+          </div>
+        </div>
+        <div style="overflow-x: auto;">
+          <table>
+            <thead>
+              <tr>
+                <th>Cod. Solicitud</th>
+                <th>Alumno / Programa</th>
+                <th>Actividad</th>
+                <th>Estado</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="tableBody"></tbody>
+          </table>
+        </div>
+      </div>
+      </div>
+
+      <!-- ═══ TAB: BUSCAR ALUMNOS ═══ -->
+      <div id="tabBuscar" style="display:none;">
+        <div class="page-title">Buscar Alumnos</div>
+        <div class="page-sub">Agrega solicitudes manualmente para alumnos próximos a egresar que no pudieron subir su certificado antes del cierre del sistema.</div>
+        <div class="card">
+          <div class="filter-bar">
+            <input type="text" class="form-input" id="searchAlumnoBox" style="width: 320px;" placeholder="Buscar por nombre, DNI o código..." oninput="renderAlumnoTable()">
+          </div>
+          <div style="overflow-x: auto;">
+            <table>
+              <thead>
+                <tr>
+                  <th>DNI</th>
+                  <th>Alumno</th>
+                  <th>Correo Institucional</th>
+                  <th>Carrera</th>
+                  <th>CL Acumulados</th>
+                  <th>Acción</th>
+                </tr>
+              </thead>
+              <tbody id="alumnoTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modalPago">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title">Verificar Váucher de Pago</span>
+      <button class="modal-close" onclick="closeModal('modalPago')"><i data-lucide="x"></i></button>
+    </div>
+    <div class="alert alert-amber"><i data-lucide="credit-card"></i> Esta actividad es externa. El alumno ha subido su comprobante de pago por S/ 135.00.</div>
+    
+    <div class="doc-preview">
+      <div class="doc-icon" style="color: var(--amber);"><i data-lucide="receipt"></i></div>
+      <div class="doc-info">
+        <div class="doc-name">vaucher_pago_caja.pdf</div>
+        <div class="doc-meta" id="pagAlumno"></div>
+      </div>
+      <button class="btn btn-ghost btn-sm"><i data-lucide="external-link"></i> Ver</button>
+    </div>
+
+    <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 24px;">
+      <button class="btn btn-ghost" onclick="closeModal('modalPago')">Cancelar</button>
+      <button class="btn btn-ghost" style="color: var(--red); border-color: var(--red);" onclick="rechazarPago()"><i data-lucide="x"></i> Rechazar Váucher</button>
+      <button class="btn btn-green" onclick="aprobarPago()"><i data-lucide="check"></i> Váucher Conforme</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modalDetalles">
+  <div class="modal modal-lg">
+    <div class="modal-header" style="margin-bottom: 16px;">
+      <div>
+        <span class="modal-title">Validación de Documentos</span>
+        <div style="font-size: 13px; color: var(--text-muted); margin-top: 4px;">Compara y corrige los datos registrados con el documento adjunto.</div>
+      </div>
+      <button class="modal-close" onclick="closeModal('modalDetalles')"><i data-lucide="x"></i></button>
+    </div>
+    
+    <div class="split-layout">
+      <div class="split-left">
+        <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom: 12px; background: var(--surface2); padding: 12px; border-radius: 8px;">
+          <div>
+            <span class="form-label" style="font-size: 10px;">Alumno / Código Solicitud</span>
+            <div id="detAlumno" style="font-size: 14px; font-weight: 700; color: var(--udep-navy); margin-top: 2px;"></div>
+            <div id="detCodigo" style="font-size: 12px; color: var(--text-muted);"></div>
+            <div style="display:flex; gap: 16px; margin-top: 6px;">
+              <span style="font-size: 12px; color: var(--text-muted);"><strong>DNI:</strong> <span id="detDni"></span></span>
+              <span style="font-size: 12px; color: var(--text-muted);"><strong>Correo:</strong> <span id="detEmail"></span></span>
+            </div>
+          </div>
+          <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 8px;">
+            <div id="modalCurrentState"></div>
+            <button class="btn btn-sm btn-ghost" id="btnEditToggle" onclick="toggleEditMode()"><i data-lucide="edit-2"></i> Modificar Datos</button>
+          </div>
+        </div>
+
+        <ul class="detail-list" id="viewModeContainer">
+          <li><span class="form-label">Nombre completo de la actividad</span><span class="val" id="viewActividad"></span></li>
+          <li><span class="form-label">Institución organizadora</span><span class="val" id="viewInstitucion"></span></li>
+          <li><span class="form-label">Procedencia</span><span class="val" id="viewProcedencia" style="text-transform: uppercase;"></span></li>
+          <li><span class="form-label">Tipo de actividad</span><span class="val" id="viewTipo"></span></li>
+          <li><span class="form-label">¿Curso evaluado con nota?</span><span class="val" id="viewEvaluado"></span></li>
+          <li><span class="form-label">Horas Certificadas</span><span class="val" id="viewHoras"></span></li>
+          <li><span class="form-label">Créditos Calculados (CL)</span><span class="val" id="viewCl" style="color: var(--green);"></span></li>
+        </ul>
+
+        <div id="editModeContainer" class="hidden" style="padding-top: 8px;">
+          <div class="form-group">
+            <label class="form-label">Nombre completo de la actividad</label>
+            <input type="text" class="form-input" id="editActividad" style="width: 100%;">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Institución organizadora</label>
+            <input type="text" class="form-input" id="editInstitucion" style="width: 100%;">
+          </div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+            <div class="form-group">
+              <label class="form-label">Procedencia</label>
+              <select class="form-input" id="editProcedencia" style="width: 100%;">
+                <option value="interna">Interna</option>
+                <option value="externa">Externa</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">¿Evaluado con nota?</label>
+              <select class="form-input" id="editEvaluado" onchange="autoCalcCL()" style="width: 100%;">
+                <option value="Sí">Sí</option>
+                <option value="No">No</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Tipo de actividad</label>
+            <select class="form-input" id="editTipo" style="width: 100%;">
+              <option value="intercambio">Curso de intercambio estudiantil</option>
+              <option value="extension">Actividades y cursos de extensión organizados por la facultad de Ingeniería</option>
+              <option value="vida_universitaria">Actividades de Vida Universitaria</option>
+              <option value="externos">Actividades externas a la facultad de Ingeniería</option>
+              <option value="congreso">Congresos</option>
+            </select>
+          </div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+            <div class="form-group">
+              <label class="form-label">Horas Certificadas</label>
+              <input type="number" class="form-input" id="editHoras" oninput="autoCalcCL()" style="width: 100%;">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Créditos Calculados</label>
+              <input type="number" class="form-input" id="editCl" readonly style="background: var(--surface2); color: var(--green); font-weight: 700; width: 100%;">
+            </div>
+          </div>
+          <div style="display: flex; gap: 8px; justify-content: flex-end; margin-top: 8px;">
+            <button class="btn btn-sm btn-ghost" onclick="toggleEditMode(false)">Cancelar</button>
+            <button class="btn btn-sm btn-primary" onclick="guardarEdicion()"><i data-lucide="save"></i> Guardar Cambios</button>
+          </div>
+        </div>
+
+        <div id="cajaObservacionDetalles" class="hidden" style="background: var(--red-bg); padding: 16px; border-radius: 8px; margin-top: 16px; border: 1px solid #FECACA;">
+          <label class="form-label" style="color: var(--red);">Motivo de subsanación</label>
+          <textarea id="txtObservacionDetalles" class="form-input" placeholder="Ej. El certificado no indica las horas cursadas."></textarea>
+          <div style="display:flex; gap: 8px; margin-top: 10px; justify-content: flex-end;">
+            <button class="btn btn-ghost btn-sm" onclick="toggleSubsanacionDetalles(false)">Cancelar</button>
+            <button class="btn btn-sm" style="background: var(--red); color: white;" onclick="confirmarSubsanacion()"><i data-lucide="send"></i> Enviar al alumno</button>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="split-right">
+        <div class="pdf-header">
+          <i data-lucide="file-text" style="width: 14px; height: 14px;"></i>
+          <span id="pdfFileName">Cargando documento...</span>
+        </div>
+        <iframe id="pdfViewer" class="pdf-viewer" src=""></iframe>
+      </div>
+    </div>
+
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 24px; padding-top: 16px; border-top: 1px solid var(--border);">
+      
+      <div id="accionesFormatoContainer" style="display: flex; gap: 10px;">
+        <button class="btn btn-ghost" onclick="toggleSubsanacionDetalles(true)" style="color: var(--amber); border-color: var(--border);"><i data-lucide="alert-circle"></i> Solicitar Subsanación</button>
+        <button class="btn btn-red btn-sm" onclick="iniciarRechazo()"><i data-lucide="x-circle"></i> Rechazar</button>
+        <button class="btn btn-green" onclick="aprobarFormato()"><i data-lucide="check-circle"></i> Aprobar Formato</button>
+      </div>
+
+      <div style="display: flex; gap: 10px; margin-left: auto;">
+        <button class="btn btn-ghost" onclick="closeModal('modalDetalles')">Cerrar</button>
+        <button class="btn btn-primary" id="btnSiguienteDetalle" onclick="siguienteDetalle()">Siguiente Alumno <i data-lucide="arrow-right"></i></button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div id="toast-container"></div>
+
+<!-- ─── MODAL MOTIVO RECHAZO (paso 1) ───────────────────────── -->
+<div class="modal-overlay" id="modalMotivoRechazo">
+  <div class="modal" style="max-width: 480px;">
+    <div class="modal-header">
+      <span class="modal-title">Motivo de Rechazo</span>
+      <button class="modal-close" onclick="closeModal('modalMotivoRechazo')"><i data-lucide="x"></i></button>
+    </div>
+    <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 16px;">Selecciona el/los motivos principales del rechazo:</p>
+    <div id="motivosList" style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px;">
+      <label style="display:flex;align-items:center;gap:10px;font-size:13px;cursor:pointer;padding:8px;border-radius:8px;border:1px solid var(--border);">
+        <input type="checkbox" value="horas_insuficientes"> Horas insuficientes (no alcanza el mínimo requerido)
+      </label>
+      <label style="display:flex;align-items:center;gap:10px;font-size:13px;cursor:pointer;padding:8px;border-radius:8px;border:1px solid var(--border);">
+        <input type="checkbox" value="certificado_invalido"> Certificado no válido o ilegible
+      </label>
+      <label style="display:flex;align-items:center;gap:10px;font-size:13px;cursor:pointer;padding:8px;border-radius:8px;border:1px solid var(--border);">
+        <input type="checkbox" value="actividad_no_aplica"> La actividad no aplica para convalidación CLC
+      </label>
+      <label style="display:flex;align-items:center;gap:10px;font-size:13px;cursor:pointer;padding:8px;border-radius:8px;border:1px solid var(--border);">
+        <input type="checkbox" value="fuera_de_plazo"> Solicitud fuera del plazo establecido
+      </label>
+      <label style="display:flex;align-items:center;gap:10px;font-size:13px;cursor:pointer;padding:8px;border-radius:8px;border:1px solid var(--border);">
+        <input type="checkbox" value="duplicada"> Solicitud duplicada (actividad ya registrada)
+      </label>
+      <label style="display:flex;align-items:center;gap:10px;font-size:13px;cursor:pointer;padding:8px;border-radius:8px;border:1px solid var(--border);">
+        <input type="checkbox" value="datos_incorrectos"> Datos de la solicitud no coinciden con el certificado
+      </label>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Otra razón (escribe tu motivo)</label>
+      <textarea class="form-input" id="otraRazonRechazo" placeholder="Describe el motivo adicional si aplica..." style="min-height: 70px;"></textarea>
+    </div>
+    <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 12px;">
+      <button class="btn btn-ghost" onclick="closeModal('modalMotivoRechazo')">Cancelar</button>
+      <button class="btn btn-red" onclick="pasarAConfirmacionRechazo()"><i data-lucide="arrow-right"></i> Siguiente: Confirmar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ─── MODAL CONFIRMAR RECHAZO (paso 2) ─────────────────────── -->
+<div class="modal-overlay" id="modalConfirmRechazo">
+  <div class="modal" style="max-width: 420px;">
+    <div class="modal-header">
+      <span class="modal-title" style="color: var(--red);">⚠ Confirmar Rechazo</span>
+      <button class="modal-close" onclick="closeModal('modalConfirmRechazo')"><i data-lucide="x"></i></button>
+    </div>
+    <p style="font-size: 14px; color: var(--text-muted); margin-bottom: 20px;">¿Estás seguro de que deseas rechazar esta solicitud? Esta acción no se puede deshacer.</p>
+    <div style="display: flex; gap: 10px; justify-content: flex-end;">
+      <button class="btn btn-ghost" onclick="closeModal('modalConfirmRechazo')">Cancelar</button>
+      <button class="btn btn-red" onclick="confirmarRechazoFinal()"><i data-lucide="x-circle"></i> Sí, rechazar definitivamente</button>
+    </div>
+  </div>
+</div>
+
+<!-- ─── MODAL AÑADIR SOLICITUD (DIRECTOR) ──────────────────── -->
+<div class="modal-overlay" id="modalAddSolicitud">
+  <div class="modal" style="max-width: 780px;">
+    <div class="modal-header">
+      <span class="modal-title">Añadir Solicitud para <span id="addSolicitudAlumnoName" style="color: var(--udep-blue);"></span></span>
+      <button class="modal-close" onclick="closeModal('modalAddSolicitud')"><i data-lucide="x"></i></button>
+    </div>
+    <div class="alert alert-blue" style="margin-bottom: 16px;"><i data-lucide="info"></i> Estás registrando una solicitud en nombre del alumno. Asegúrate de contar con el certificado físico o digital.</div>
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+      <div class="form-group" style="grid-column: 1/-1;">
+        <label class="form-label">Nombre completo de la actividad</label>
+        <input type="text" class="form-input" id="addNombre" placeholder="Ej. Taller de Innovación" style="width: 100%;">
+      </div>
+      <div class="form-group" style="grid-column: 1/-1;">
+        <label class="form-label">Institución organizadora</label>
+        <input type="text" class="form-input" id="addInstitucion" placeholder="Ej. CONCYTEC" style="width: 100%;">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Procedencia</label>
+        <select class="form-input" id="addProcedencia" style="width: 100%;">
+          <option value="interna">Interna (UDEP)</option>
+          <option value="externa">Externa</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Tipo de actividad</label>
+        <select class="form-input" id="addTipo" style="width: 100%;">
+          <option value="intercambio">Curso de intercambio estudiantil</option>
+          <option value="extension">Actividades y cursos de extensión organizados por la facultad de Ingeniería</option>
+          <option value="vida_universitaria">Actividades de Vida Universitaria</option>
+          <option value="externos">Actividades externas a la facultad de Ingeniería</option>
+          <option value="congreso">Congresos</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">¿Evaluado con nota?</label>
+        <select class="form-input" id="addEvaluado" onchange="autoCalcAddCL()" style="width: 100%;">
+          <option value="Sí">Sí (16h = 1 CL)</option>
+          <option value="No">No (32h = 1 CL)</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Horas certificadas</label>
+        <input type="number" class="form-input" id="addHoras" min="1" placeholder="0" oninput="autoCalcAddCL()" style="width: 100%;">
+      </div>
+      <div class="form-group" style="grid-column: 1/-1;">
+        <label class="form-label">Créditos calculados (CL)</label>
+        <input type="number" class="form-input" id="addCl" readonly style="background: var(--surface2); color: var(--green); font-weight: 700; width: 100%;">
+      </div>
+      <div class="form-group" style="grid-column: 1/-1;">
+        <label class="form-label">Certificado / Constancia <span style="color:var(--text-muted);font-weight:400;text-transform:none">(PDF, JPG o PNG · máx. 5 MB)</span></label>
+        <div id="addUploadZone" onclick="simulateAddUpload()" style="border:2px dashed var(--border);border-radius:10px;padding:20px;text-align:center;cursor:pointer;background:var(--bg);transition:all .2s;">
+          <div style="display:flex;justify-content:center;margin-bottom:6px;color:var(--text-muted)"><i data-lucide="upload-cloud" style="width:32px;height:32px"></i></div>
+          <p style="font-size:13px;color:var(--text-muted)"><strong style="color:var(--udep-blue)">Haz clic para adjuntar</strong> o arrastra aquí</p>
+        </div>
+        <div id="addFileUploaded" style="display:none;align-items:center;gap:10px;padding:10px;background:var(--green-bg);border-radius:8px;margin-top:8px">
+          <i data-lucide="file-check" style="color:var(--green);flex-shrink:0"></i>
+          <span id="addFileName" style="font-size:13px;color:var(--green);font-weight:600;flex:1">certificado.pdf</span>
+          <button onclick="removeAddFile()" style="background:none;border:none;color:var(--green);cursor:pointer;padding:2px"><i data-lucide="x"></i></button>
+        </div>
+      </div>
+    </div>
+    <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 16px;">
+      <button class="btn btn-ghost" onclick="closeModal('modalAddSolicitud')">Cancelar</button>
+      <button class="btn btn-primary" onclick="guardarSolicitudDirector()"><i data-lucide="send"></i> Registrar Solicitud</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// Base de datos simulada
+let solicitudes = [
+  {
+    id: 'CLC-001', alumno: 'Eduardo Joao Sánchez Farías', carrera: 'Ingeniería Industrial y de Sistemas',
+    actividad: 'Asociación Estudiantil CIMA', institucion: 'Universidad de Piura', tipo_actividad: 'Vida Universitaria', 
+    evaluado: 'No', horas: 29, cl: 1, procedencia: 'interna',
+    estado: 'formato', archivo: 'Certificado CIMA 2024-I.pdf'
+  },
+  {
+    id: 'CLC-002', alumno: 'Stiwar Andrés López Herrera', carrera: 'Ingeniería Mecánico Eléctrico',
+    actividad: 'Machine Learning con Python', institucion: 'UNI', tipo_actividad: 'Cursos de extensión',
+    evaluado: 'Sí', horas: 16, cl: 1, procedencia: 'externa',
+    estado: 'formato', archivo: 'Certificado Machine Learning con Python- UNI.pdf'
+  },
+  {
+    id: 'CLC-003', alumno: 'Peter Rodrigo Medina Castillo', carrera: 'Ingeniería Industrial y de Sistemas',
+    actividad: 'Club de Excel Avanzado', institucion: 'Universidad de Piura', tipo_actividad: 'Arte y Cultura',
+    evaluado: 'No', horas: 32, cl: 1, procedencia: 'interna',
+    estado: 'formato', archivo: 'Certificado_Excel_Avanzado_Club.pdf'
+  },
+  {
+    id: 'CLC-004', alumno: 'Joaquín Alejandro Paredes Ruiz', carrera: 'Arquitectura',
+    actividad: 'Voluntariado de Construcción Solidaria', institucion: 'ONG TECHO', tipo_actividad: 'Vida Universitaria',
+    evaluado: 'No', horas: 40, cl: 1, procedencia: 'externa',
+    estado: 'subsanacion', archivo: 'constancia_generica.pdf'
+  },
+  {
+    id: 'CLC-005', alumno: 'Samuel Ignacio Guerrero Távara', carrera: 'Ingeniería Civil',
+    actividad: 'Seminario de Construcción Antisísmica', institucion: 'SENCICO', tipo_actividad: 'Seminarios',
+    evaluado: 'No', horas: 16, cl: 1, procedencia: 'externa',
+    estado: 'direccion', archivo: 'seminario.pdf'
+  },
+  {
+    id: 'CLC-006', alumno: 'Fiorella Xiomara Mendoza Vásquez', carrera: 'Ingeniería de Software e Inteligencia Artificial',
+    actividad: 'Certificación de Azure Fundamentals', institucion: 'Microsoft', tipo_actividad: 'Actividades externas',
+    evaluado: 'Sí', horas: 32, cl: 1, procedencia: 'externa',
+    estado: 'pago_revision', archivo: 'cert_azure.pdf'
+  },
+  {
+    id: 'CLC-007', alumno: 'Camila Beatriz Ríos Salcedo', carrera: 'Arquitectura',
+    actividad: 'Curso de Diseño Digital Básico', institucion: 'Instituto Toulouse', tipo_actividad: 'Cursos de extensión',
+    evaluado: 'No', horas: 8, cl: 0, procedencia: 'externa',
+    estado: 'rechazado', archivo: 'cert_toulouse.pdf',
+    motivoRechazo: 'Horas insuficientes (8h < 32h mínimo para actividad sin nota).'
+  }
+];
+
+const estadosMap = {
+  'formato': { label: 'Documentos por Validar', badge: 'badge-blue' },
+  'pago_revision': { label: 'Espera de Pago', badge: 'badge-amber' },
+  'subsanacion': { label: 'Esperando Subsanación', badge: 'badge-red' },
+  'rechazado': { label: 'Rechazado', badge: 'badge-red' },
+  'direccion': { label: 'Aprobado', badge: 'badge-green' }
+};
+
+let activeId = null;
+let currentFilteredList = []; 
+let currentNavIds = [];
+let isEditing = false;
+
+function init() {
+  lucide.createIcons();
+  renderDashboard();
+}
+
+function renderDashboard() {
+  renderStats();
+  renderTable();
+}
+
+function renderStats() {
+  const stats = {
+    total: solicitudes.length,
+    formato: solicitudes.filter(s => s.estado === 'formato').length,
+    subsanacion: solicitudes.filter(s => s.estado === 'subsanacion').length,
+    pago: solicitudes.filter(s => s.estado === 'pago_revision').length,
+    rechazados: solicitudes.filter(s => s.estado === 'rechazado').length,
+    aprobados: solicitudes.filter(s => s.estado === 'direccion').length
+  };
+
+  document.getElementById('statsContainer').innerHTML = `
+    <div class="stat-card"><div class="stat-label">Total Solicitudes</div><div class="stat-value">${stats.total}</div></div>
+    <div class="stat-card" style="border-left: 4px solid var(--udep-blue)"><div class="stat-label">Docs. por Validar</div><div class="stat-value">${stats.formato}</div></div>
+    <div class="stat-card" style="border-left: 4px solid var(--amber)"><div class="stat-label">Espera Subsanación</div><div class="stat-value">${stats.subsanacion}</div></div>
+    <div class="stat-card" style="border-left: 4px solid #D97706"><div class="stat-label">Espera de Pago</div><div class="stat-value">${stats.pago}</div></div>
+    <div class="stat-card" style="border-left: 4px solid var(--red)"><div class="stat-label">Rechazados</div><div class="stat-value">${stats.rechazados}</div></div>
+    <div class="stat-card" style="border-left: 4px solid var(--green)"><div class="stat-label">Aprobados</div><div class="stat-value">${stats.aprobados}</div></div>
+  `;
+}
+
+function renderTable() {
+  const tbody = document.getElementById('tableBody');
+  const searchVal = document.getElementById('searchBox').value.toLowerCase();
+  const filterProg = document.getElementById('filterPrograma').value;
+  const filterEst = document.getElementById('filterEstado').value;
+
+  currentFilteredList = solicitudes.filter(s => {
+    const matchSearch = s.alumno.toLowerCase().includes(searchVal) || s.id.toLowerCase().includes(searchVal);
+    const matchProg = (filterProg === 'Todos') || (s.carrera === filterProg);
+    const matchEst = (filterEst === 'Todos') || (s.estado === filterEst);
+    return matchSearch && matchProg && matchEst;
+  });
+
+  // Guardamos un snapshot de los IDs para que la navegación siga funcionando
+  // incluso si el estado de un elemento cambia en segundo plano.
+  currentNavIds = currentFilteredList.map(s => s.id);
+
+  if(currentFilteredList.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; padding: 40px; color: var(--text-muted);">No se encontraron solicitudes.</td></tr>`;
+    return;
+  }
+
+  // Ocultar columna de Horas/CL en el HTML (Punto 2)
+  tbody.innerHTML = currentFilteredList.map(s => {
+    let actionBtn = '';
+    
+    // Botones rápidos para acciones que no sean formato
+    if (s.estado === 'subsanacion') {
+      actionBtn = `<span style="font-size: 12px; color: var(--red);"></span>`;
+    } else if (s.estado === 'direccion') {
+      actionBtn = `<span style="font-size: 12px; color: var(--text-muted);"></span>`;
+    } else if (s.estado === 'pago_revision') {
+      actionBtn = ``; // Se eliminó el botón de Verificar Váucher
+    }
+
+    let detailsBtn = `<button class="btn btn-sm ${s.estado === 'formato' ? 'btn-primary' : 'btn-ghost'}" onclick="openModalDetalles('${s.id}')" title="Validar formulario y documento"><i data-lucide="${s.estado === 'formato' ? 'file-check' : 'layout-template'}"></i> ${s.estado === 'formato' ? 'Revisar Documento' : 'Detalles'}</button>`;
+
+    return `
+      <tr>
+        <td><strong style="color: var(--udep-navy)">${s.id}</strong><br><span style="font-size: 11px; color: var(--text-muted)">${s.procedencia === 'externa' ? 'EXTERNA' : 'INTERNA'}</span></td>
+        <td><strong>${s.alumno}</strong><br><span style="font-size: 11px; color: var(--text-muted)">${s.carrera}</span></td>
+        <td>${s.actividad}</td>
+        <td><span class="badge ${estadosMap[s.estado].badge}"><span class="dot"></span> ${estadosMap[s.estado].label}</span></td>
+        <td><div class="table-actions">${detailsBtn} ${actionBtn}</div></td>
+      </tr>
+    `;
+  }).join('');
+  lucide.createIcons();
+}
+
+/* ─── LÓGICA DEL MODAL DE DETALLES (LISTA + EDICIÓN + ACCIONES) ──────────────── */
+
+function openModalDetalles(id) {
+  activeId = id;
+  const s = solicitudes.find(x => x.id === id);
+  
+  // 1. Resetear estados visuales
+  toggleEditMode(false, false); 
+  toggleSubsanacionDetalles(false);
+
+  // 2. Poblar Cabecera
+  document.getElementById('detAlumno').textContent = s.alumno;
+  document.getElementById('detCodigo').textContent = `${s.id} · ${s.carrera}`;
+  document.getElementById('modalCurrentState').innerHTML = `<span class="badge ${estadosMap[s.estado]?.badge || 'badge-gray'}"><span class="dot"></span> ${estadosMap[s.estado]?.label || s.estado}</span>`;
+  const alumnoInfo = getAlumnoData(s.alumno);
+  document.getElementById('detDni').textContent = alumnoInfo.dni;
+  document.getElementById('detEmail').textContent = alumnoInfo.email;
+  
+  // 3. Poblar Vista de Lectura (Lista)
+  document.getElementById('viewActividad').textContent = s.actividad;
+  document.getElementById('viewInstitucion').textContent = s.institucion;
+  document.getElementById('viewProcedencia').textContent = s.procedencia;
+  document.getElementById('viewTipo').textContent = s.tipo_actividad;
+  document.getElementById('viewEvaluado').innerHTML = s.evaluado === 'Sí' ? '<span class="badge badge-green">Sí</span>' : '<span class="badge badge-gray">No</span>';
+  document.getElementById('viewHoras').textContent = `${s.horas} h`;
+  document.getElementById('viewCl').textContent = `${s.cl} CL`;
+
+  // 4. Poblar Formulario de Edición
+  document.getElementById('editActividad').value = s.actividad;
+  document.getElementById('editInstitucion').value = s.institucion;
+  document.getElementById('editProcedencia').value = s.procedencia;
+  document.getElementById('editTipo').value = s.tipo_actividad;
+  document.getElementById('editEvaluado').value = s.evaluado;
+  document.getElementById('editHoras').value = s.horas;
+  document.getElementById('editCl').value = s.cl;
+
+  // 5. Visor PDF
+  document.getElementById('pdfFileName').textContent = s.archivo;
+  document.getElementById('pdfViewer').src = encodeURI(s.archivo);
+
+  // 6. Mostrar/Ocultar botones de acción según el estado
+  const containerAcciones = document.getElementById('accionesFormatoContainer');
+  if(s.estado === 'formato') {
+    containerAcciones.style.display = 'flex';
+  } else {
+    containerAcciones.style.display = 'none';
+  }
+
+  // 7. Lógica del botón Siguiente (Respeta la lista original de cuando abriste el modal)
+  const currentIndex = currentNavIds.indexOf(id);
+  const btnNext = document.getElementById('btnSiguienteDetalle');
+  btnNext.disabled = (currentIndex >= currentNavIds.length - 1 || currentIndex === -1);
+
+  document.getElementById('modalDetalles').classList.add('open');
+}
+
+function siguienteDetalle() {
+  const currentIndex = currentNavIds.indexOf(activeId);
+  if (currentIndex !== -1 && currentIndex < currentNavIds.length - 1) {
+    const nextId = currentNavIds[currentIndex + 1];
+    openModalDetalles(nextId);
+  }
+}
+
+// Alterna entre la Lista de lectura y el Formulario de edición
+function toggleEditMode(forceState = null, checkEvent = true) {
+  if(forceState !== null) isEditing = forceState;
+  else isEditing = !isEditing;
+
+  const btnToggle = document.getElementById('btnEditToggle');
+  const viewContainer = document.getElementById('viewModeContainer');
+  const editContainer = document.getElementById('editModeContainer');
+  const containerAcciones = document.getElementById('accionesFormatoContainer');
+
+  if (isEditing) {
+    viewContainer.classList.add('hidden');
+    editContainer.classList.remove('hidden');
+    btnToggle.classList.add('hidden');
+    // Ocultar acciones de aprobar/subsanar mientras se edita para evitar errores
+    containerAcciones.style.display = 'none'; 
+    toggleSubsanacionDetalles(false);
+  } else {
+    viewContainer.classList.remove('hidden');
+    editContainer.classList.add('hidden');
+    btnToggle.classList.remove('hidden');
+    
+    // Restaurar acciones si el estado es formato
+    const s = solicitudes.find(x => x.id === activeId);
+    if(s && s.estado === 'formato') containerAcciones.style.display = 'flex';
+  }
+}
+
+// Autocalcula los créditos en el formulario de edición
+function autoCalcCL() {
+  const horas = parseInt(document.getElementById('editHoras').value) || 0;
+  const evaluado = document.getElementById('editEvaluado').value;
+  const divisor = (evaluado === 'Sí') ? 16 : 32;
+  const clCalc = Math.floor(horas / divisor);
+  document.getElementById('editCl').value = clCalc;
+}
+
+// Guarda la edición y refresca la vista
+function guardarEdicion() {
+  const s = solicitudes.find(x => x.id === activeId);
+  s.actividad = document.getElementById('editActividad').value.trim();
+  s.institucion = document.getElementById('editInstitucion').value.trim();
+  s.procedencia = document.getElementById('editProcedencia').value;
+  s.tipo_actividad = document.getElementById('editTipo').value;
+  s.evaluado = document.getElementById('editEvaluado').value;
+  s.horas = parseInt(document.getElementById('editHoras').value) || 0;
+  s.cl = parseInt(document.getElementById('editCl').value) || 0;
+
+  showToast('Datos modificados correctamente', 'success');
+  openModalDetalles(activeId); // Recarga el modal con los nuevos datos
+}
+
+/* ─── LÓGICA DE APROBACIÓN Y SUBSANACIÓN (DESDE DETALLES) ──────────────── */
+
+function toggleSubsanacionDetalles(show) {
+  const caja = document.getElementById('cajaObservacionDetalles');
+  const txt = document.getElementById('txtObservacionDetalles');
+  if (show) {
+    caja.classList.remove('hidden');
+    txt.value = '';
+    txt.focus();
+  } else {
+    caja.classList.add('hidden');
+  }
+}
+
+function confirmarSubsanacion() {
+  const msg = document.getElementById('txtObservacionDetalles').value;
+  if(!msg) return showToast('Escribe el motivo de la subsanación', 'error');
+  
+  const s = solicitudes.find(x => x.id === activeId);
+  s.estado = 'subsanacion';
+  
+  // Ocultar opciones de formato y mostrar actualización de la etiqueta (Punto 1)
+  document.getElementById('accionesFormatoContainer').style.display = 'none';
+  document.getElementById('cajaObservacionDetalles').classList.add('hidden');
+  document.getElementById('modalCurrentState').innerHTML = `<span class="badge badge-red"><span class="dot"></span> Esperando Subsanación</span>`;
+  
+  showToast(`Correo enviado a ${s.alumno} solicitando corrección.`, 'success');
+  // Se evita ejecutar renderDashboard() para no interrumpir el flujo del botón "Siguiente"
+}
+
+function aprobarFormato() {
+  const s = solicitudes.find(x => x.id === activeId);
+  s.estado = 'direccion';
+  
+  // Ocultar opciones de formato y mostrar actualización de la etiqueta (Punto 1)
+  document.getElementById('accionesFormatoContainer').style.display = 'none';
+  document.getElementById('modalCurrentState').innerHTML = `<span class="badge badge-green"><span class="dot"></span> Aprobado</span>`;
+  
+  showToast('Formato válido.', 'success');
+  // Se evita ejecutar renderDashboard() para no interrumpir el flujo del botón "Siguiente"
+}
+
+/* ─── LÓGICA DE PAGO ───────────────────────────────────────────────────────── */
+
+function openModalPago(id) {
+  activeId = id;
+  const s = solicitudes.find(x => x.id === id);
+  document.getElementById('pagAlumno').textContent = s.alumno;
+  document.getElementById('modalPago').classList.add('open');
+}
+
+function rechazarPago() {
+  const s = solicitudes.find(x => x.id === activeId);
+  s.estado = 'subsanacion'; 
+  closeModal('modalPago');
+  showToast('Váucher rechazado. Se notificó al alumno para que resuba el documento.', 'error');
+  // Al cerrar el modal se ejecuta renderDashboard automáticamente
+}
+
+function aprobarPago() {
+  const s = solicitudes.find(x => x.id === activeId);
+  s.estado = 'direccion'; 
+  closeModal('modalPago');
+  showToast('Pago validado correctamente. Solicitud Aprobada.', 'success');
+  // Al cerrar el modal se ejecuta renderDashboard automáticamente
+}
+
+/* ─── UTILIDADES ──────────────────────────────────────────────────────────── */
+
+function closeModal(modalId) {
+  document.getElementById(modalId).classList.remove('open');
+  if(modalId === 'modalDetalles') {
+    document.getElementById('pdfViewer').src = '';
+    // Solo cuando se cierra el modal grande es que aplicamos el refresco a la tabla de fondo
+    renderDashboard(); 
+  } else if (modalId === 'modalPago') {
+    renderDashboard();
+  }
+}
+
+function showToast(msg, type = '') {
+  const container = document.getElementById('toast-container');
+  const toast = document.createElement('div');
+  toast.className = `toast`;
+  if(type==='success') toast.style.background = 'var(--green)';
+  if(type==='error') toast.style.background = 'var(--udep-red)';
+  toast.innerHTML = `<i data-lucide="${type==='success'?'check-circle':type==='error'?'alert-circle':'info'}"></i> ${msg}`;
+  container.appendChild(toast);
+  lucide.createIcons();
+  setTimeout(() => toast.remove(), 3500);
+}
+
+/* ─── DATOS EXTENDIDOS DE ALUMNOS (DNI, EMAIL) ─────────────────── */
+const alumnosData = [
+  { nombre: 'Eduardo Joao Sánchez Farías', dni: '72341856', email: 'eduardo.sanchez.f@alum.udep.edu.pe', carrera: 'Ingeniería Industrial y de Sistemas', clAcum: 2 },
+  { nombre: 'Stiwar Andrés López Herrera', dni: '70482931', email: 'stiwar.lopez.h@alum.udep.edu.pe', carrera: 'Ingeniería Mecánico Eléctrico', clAcum: 1 },
+  { nombre: 'Peter Rodrigo Medina Castillo', dni: '73512048', email: 'peter.medina.c@alum.udep.edu.pe', carrera: 'Ingeniería Industrial y de Sistemas', clAcum: 1 },
+  { nombre: 'Joaquín Alejandro Paredes Ruiz', dni: '74823617', email: 'joaquin.paredes.r@alum.udep.edu.pe', carrera: 'Arquitectura', clAcum: 0 },
+  { nombre: 'Samuel Ignacio Guerrero Távara', dni: '71934825', email: 'samuel.guerrero.t@alum.udep.edu.pe', carrera: 'Ingeniería Civil', clAcum: 1 },
+  { nombre: 'Fiorella Xiomara Mendoza Vásquez', dni: '75612034', email: 'fiorella.mendoza.v@alum.udep.edu.pe', carrera: 'Ingeniería de Software e Inteligencia Artificial', clAcum: 0 },
+  { nombre: 'Camila Beatriz Ríos Salcedo', dni: '76042815', email: 'camila.rios.s@alum.udep.edu.pe', carrera: 'Arquitectura', clAcum: 0 },
+  { nombre: 'Fabiola Paola Montoya Aguilar', dni: '73198246', email: 'fabiola.montoya.a@alum.udep.edu.pe', carrera: 'Ingeniería Civil', clAcum: 2 },
+  { nombre: 'Diego Alonso Arce Vallejos', dni: '74501923', email: 'diego.arce.v@alum.udep.edu.pe', carrera: 'Arquitectura', clAcum: 3 },
+  { nombre: 'Valeria Luciana Chumacero Pintado', dni: '72836495', email: 'valeria.chumacero.p@alum.udep.edu.pe', carrera: 'Ingeniería Industrial y de Sistemas', clAcum: 1 },
+];
+
+function getAlumnoData(nombre) {
+  return alumnosData.find(a => a.nombre === nombre) || { dni: '—', email: '—' };
+}
+
+/* ─── TAB SWITCHING ─────────────────────────────────────────────── */
+function showTab(tab) {
+  document.getElementById('tabBandeja').style.display = tab === 'bandeja' ? '' : 'none';
+  document.getElementById('tabBuscar').style.display = tab === 'buscar' ? '' : 'none';
+  document.getElementById('navBandeja').classList.toggle('active', tab === 'bandeja');
+  document.getElementById('navBuscar').classList.toggle('active', tab === 'buscar');
+  if (tab === 'buscar') renderAlumnoTable();
+}
+
+/* ─── BUSCAR ALUMNOS TABLE ─────────────────────────────────────── */
+function renderAlumnoTable() {
+  const q = (document.getElementById('searchAlumnoBox').value || '').toLowerCase();
+  const tbody = document.getElementById('alumnoTableBody');
+  const filtered = alumnosData.filter(a =>
+    a.nombre.toLowerCase().includes(q) ||
+    a.dni.includes(q) ||
+    a.email.toLowerCase().includes(q)
+  );
+  if (!filtered.length) {
+    tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;padding:40px;color:var(--text-muted)">No se encontraron alumnos.</td></tr>`;
+    return;
+  }
+  tbody.innerHTML = filtered.map(a => `
+    <tr>
+      <td style="font-family: monospace; font-size: 13px;">${a.dni}</td>
+      <td><strong>${a.nombre}</strong></td>
+      <td style="font-size: 12px; color: var(--udep-blue);">${a.email}</td>
+      <td>${a.carrera}</td>
+      <td><strong style="color: var(--udep-navy)">${a.clAcum} CL</strong></td>
+      <td><button class="btn btn-sm btn-primary" onclick="abrirAddSolicitud('${a.nombre}')"><i data-lucide="plus"></i> Añadir Solicitud</button></td>
+    </tr>
+  `).join('');
+  lucide.createIcons();
+}
+
+/* ─── AÑADIR SOLICITUD (DIRECTOR) ──────────────────────────────── */
+let addSolicitudAlumno = null;
+
+let addFileAttached = false;
+let addFileNameStore = '';
+
+function simulateAddUpload() {
+  // Simulate a file picker — in a real app this would open <input type="file">
+  const fakeName = 'certificado_' + (addSolicitudAlumno || 'alumno').split(' ')[0].toLowerCase() + '.pdf';
+  addFileAttached = true;
+  addFileNameStore = fakeName;
+  document.getElementById('addUploadZone').style.display = 'none';
+  const uploaded = document.getElementById('addFileUploaded');
+  uploaded.style.display = 'flex';
+  document.getElementById('addFileName').textContent = fakeName;
+  lucide.createIcons();
+}
+
+function removeAddFile() {
+  addFileAttached = false;
+  addFileNameStore = '';
+  document.getElementById('addUploadZone').style.display = '';
+  document.getElementById('addFileUploaded').style.display = 'none';
+}
+
+function abrirAddSolicitud(nombre) {
+  addSolicitudAlumno = nombre;
+  document.getElementById('addSolicitudAlumnoName').textContent = nombre;
+  document.getElementById('addNombre').value = '';
+  document.getElementById('addInstitucion').value = '';
+  document.getElementById('addProcedencia').value = 'interna';
+  document.getElementById('addTipo').value = 'extension';
+  document.getElementById('addEvaluado').value = 'Sí';
+  document.getElementById('addHoras').value = '';
+  document.getElementById('addCl').value = '0';
+  removeAddFile();
+  document.getElementById('modalAddSolicitud').classList.add('open');
+  lucide.createIcons();
+}
+
+function autoCalcAddCL() {
+  const horas = parseInt(document.getElementById('addHoras').value) || 0;
+  const evaluado = document.getElementById('addEvaluado').value;
+  const divisor = evaluado === 'Sí' ? 16 : 32;
+  document.getElementById('addCl').value = Math.floor(horas / divisor);
+}
+
+function guardarSolicitudDirector() {
+  const nombre = document.getElementById('addNombre').value.trim();
+  const institucion = document.getElementById('addInstitucion').value.trim();
+  if (!nombre || !institucion) {
+    showToast('Completa el nombre de la actividad e institución.', 'error');
+    return;
+  }
+  const horas = parseInt(document.getElementById('addHoras').value) || 0;
+  if (horas < 1) { showToast('Ingresa las horas certificadas.', 'error'); return; }
+  const evaluado = document.getElementById('addEvaluado').value;
+  const divisor = evaluado === 'Sí' ? 16 : 32;
+  const newId = 'CLC-' + String(solicitudes.length + 1).padStart(3, '0');
+  const alumnoInfo = getAlumnoData(addSolicitudAlumno);
+  solicitudes.push({
+    id: newId,
+    alumno: addSolicitudAlumno,
+    carrera: alumnoInfo.carrera || 'Ingeniería',
+    actividad: nombre,
+    institucion: institucion,
+    tipo_actividad: document.getElementById('addTipo').value,
+    evaluado: evaluado,
+    horas: horas,
+    cl: Math.floor(horas / divisor),
+    procedencia: document.getElementById('addProcedencia').value,
+    estado: 'formato',
+    archivo: addFileAttached ? addFileNameStore : 'sin_certificado.pdf',
+    agregadoPorDirector: true
+  });
+  closeModal('modalAddSolicitud');
+  renderDashboard();
+  showToast(`Solicitud ${newId} registrada para ${addSolicitudAlumno}`, 'success');
+}
+
+/* ─── FLUJO DE RECHAZO ──────────────────────────────────────────── */
+function iniciarRechazo() {
+  // Primero mostrar motivos, luego confirmación
+  document.getElementById('modalDetalles').classList.remove('open');
+  document.querySelectorAll('#motivosList input[type=checkbox]').forEach(cb => cb.checked = false);
+  document.getElementById('otraRazonRechazo').value = '';
+  document.getElementById('modalMotivoRechazo').classList.add('open');
+}
+
+function pasarAConfirmacionRechazo() {
+  const checks = [...document.querySelectorAll('#motivosList input[type=checkbox]:checked')];
+  const otra = document.getElementById('otraRazonRechazo').value.trim();
+  if (!checks.length && !otra) {
+    showToast('Selecciona al menos un motivo de rechazo.', 'error');
+    return;
+  }
+  closeModal('modalMotivoRechazo');
+  document.getElementById('modalConfirmRechazo').classList.add('open');
+}
+
+function confirmarRechazoFinal() {
+  const checks = [...document.querySelectorAll('#motivosList input[type=checkbox]:checked')].map(cb => cb.parentElement.textContent.trim());
+  const otra = document.getElementById('otraRazonRechazo').value.trim();
+  const s = solicitudes.find(x => x.id === activeId);
+  s.estado = 'rechazado';
+  s.motivoRechazo = [...checks, ...(otra ? ['Otra razón: ' + otra] : [])].join(' | ');
+  closeModal('modalConfirmRechazo');
+  renderDashboard();
+  showToast(`Solicitud ${activeId} rechazada.`, 'error');
+}
+
+window.onload = init;
+</script>
+</body>
+</html>

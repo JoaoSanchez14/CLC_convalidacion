@@ -1,0 +1,1956 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<link rel="icon" type="image/png" href="Logo.jpg">
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta property="og:title" content="Convalidaciones CLC - UDEP" />
+<meta property="og:description" content="Consulta el proceso de convalidación de cursos." />
+<title>CLC UDEP</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<script src="https://unpkg.com/lucide@latest"></script>
+
+<style>
+/* ─── DESIGN TOKENS ─────────────────────────────────────────── */
+:root {
+  --udep-navy:   #002855;
+  --udep-blue:   #004B93;
+  --udep-red:    #C8102E;
+  --udep-gold:   #E8A020;
+  --bg:          #F0F4F9;
+  --surface:     #FFFFFF;
+  --surface2:    #EBF0F8;
+  --text:        #1A2437;
+  --text-muted:  #6B7A99;
+  --border:      #D0DAEA;
+  --green:       #0E7A4E;
+  --green-bg:    #DCFCE7;
+  --amber:       #B45309;
+  --amber-bg:    #FEF3C7;
+  --red:         #C8102E;
+  --red-bg:      #FEE2E2;
+  --radius:      12px;
+  --shadow:      0 2px 12px rgba(0,40,85,.10);
+  --shadow-lg:   0 8px 32px rgba(0,40,85,.16);
+}
+
+/* ─── RESET ─────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 15px; }
+body { font-family: 'Outfit', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+button { cursor: pointer; font-family: inherit; }
+input, select, textarea { font-family: inherit; }
+a { text-decoration: none; color: inherit; }
+
+/* ─── SCROLLBAR ──────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 99px; }
+
+/* ─── LAYOUT ─────────────────────────────────────────────────── */
+.app { display: flex; min-height: 100vh; }
+
+/* ─── SIDEBAR ─────────────────────────────────────────────────── */
+.sidebar {
+  width: 240px; min-width: 240px;
+  background: var(--udep-navy);
+  display: flex; flex-direction: column;
+  padding: 24px 0;
+  position: fixed; top: 0; left: 0; bottom: 0;
+  z-index: 100;
+}
+.sidebar-logo {
+  padding: 0 20px 24px;
+  border-bottom: 1px solid rgba(255,255,255,.08);
+  display: flex; flex-direction: column; gap: 4px;
+}
+.sidebar-logo .logo-badge {
+  background: var(--udep-red);
+  color: #fff; font-weight: 800; font-size: 18px;
+  padding: 6px 12px; border-radius: 8px; letter-spacing: .5px;
+  display: inline-block; width: fit-content;
+}
+.sidebar-logo .logo-sub {
+  color: rgba(255,255,255,.55); font-size: 11px; font-weight: 500;
+  letter-spacing: .8px; text-transform: uppercase;
+  padding-left: 2px; margin-top: 6px;
+}
+.sidebar-nav { padding: 16px 12px; flex: 1; display: flex; flex-direction: column; gap: 10px; }
+.nav-item {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 8px; padding: 20px 12px;
+  color: rgba(255,255,255,.60);
+  font-size: 13px; font-weight: 600;
+  border-radius: 10px;
+  background: rgba(255,255,255,.05);
+  border: 1.5px solid rgba(255,255,255,.07);
+  cursor: pointer; transition: all .18s;
+  text-align: center; line-height: 1.2;
+  flex: 1;
+}
+.nav-item:hover { background: rgba(255,255,255,.10); color: #fff; }
+.nav-item.active {
+  background: rgba(255,255,255,.17); color: #fff;
+  border-color: var(--udep-gold);
+  box-shadow: 0 2px 12px rgba(0,0,0,.25);
+}
+.nav-item svg { width: 22px; height: 22px; flex-shrink: 0; }
+.sidebar-bottom {
+  padding: 16px 20px 0;
+  border-top: 1px solid rgba(255,255,255,.08);
+}
+.user-chip {
+  display: flex; align-items: center; gap: 10px;
+}
+.user-avatar {
+  width: 34px; height: 34px; border-radius: 50%;
+  background: var(--udep-blue); display: flex; align-items: center;
+  justify-content: center; color: #fff; font-weight: 700; font-size: 13px;
+  flex-shrink: 0;
+}
+.user-info { flex: 1; overflow: hidden; }
+.user-name { font-size: 13px; font-weight: 600; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.user-role { font-size: 11px; color: rgba(255,255,255,.45); }
+
+/* ─── MAIN ────────────────────────────────────────────────────── */
+.main { flex: 1; margin-left: 240px; display: flex; flex-direction: column; min-height: 100vh; }
+.topbar {
+  background: var(--surface); border-bottom: 1px solid var(--border);
+  padding: 0 32px; height: 60px;
+  display: flex; align-items: center; justify-content: space-between;
+  position: sticky; top: 0; z-index: 50;
+}
+.topbar-title { font-size: 16px; font-weight: 700; color: var(--udep-navy); }
+.topbar-actions { display: flex; align-items: center; gap: 12px; }
+.role-switch {
+  display: flex; align-items: center; gap: 0;
+  background: var(--bg); border: 1px solid var(--border); border-radius: 8px; overflow: hidden;
+}
+.role-btn {
+  padding: 6px 14px; font-size: 12px; font-weight: 600;
+  background: none; border: none; color: var(--text-muted);
+  transition: all .15s;
+}
+.role-btn.active { background: var(--udep-navy); color: #fff; }
+.content { padding: 28px 32px; flex: 1; }
+
+/* ─── VIEWS ──────────────────────────────────────────────────── */
+.view { display: none; }
+.view.active { display: block; }
+
+/* ─── PAGE TITLE ─────────────────────────────────────────────── */
+.page-title { font-size: 22px; font-weight: 800; color: var(--udep-navy); margin-bottom: 4px; }
+.page-sub { font-size: 13px; color: var(--text-muted); margin-bottom: 24px; }
+
+/* ─── GRID ────────────────────────────────────────────────────── */
+.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.grid3 { display: grid; grid-template-columns: repeat(3,1fr); gap: 20px; }
+.grid4 { display: grid; grid-template-columns: repeat(4,1fr); gap: 20px; }
+.grid-auto { display: grid; grid-template-columns: repeat(auto-fill,minmax(280px,1fr)); gap: 20px; }
+
+/* ─── CARD ────────────────────────────────────────────────────── */
+.card {
+  background: var(--surface); border-radius: var(--radius);
+  box-shadow: var(--shadow); border: 1px solid var(--border);
+  padding: 22px;
+}
+.card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+.card-title { font-size: 13px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: .6px; }
+
+/* ─── STAT CARD ───────────────────────────────────────────────── */
+.stat-card {
+  background: var(--surface); border-radius: var(--radius);
+  box-shadow: var(--shadow); border: 1px solid var(--border);
+  padding: 20px; display: flex; flex-direction: column; gap: 8px;
+}
+.stat-label { font-size: 12px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: .5px; }
+.stat-value { font-size: 32px; font-weight: 800; color: var(--udep-navy); line-height: 1; }
+.stat-sub { font-size: 12px; color: var(--text-muted); }
+
+/* ─── PAYMENT MODAL ──────────────────────────────────────────── */
+.pay-modal-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,.50);
+  z-index: 300; display: flex; align-items: center; justify-content: center;
+  opacity: 0; pointer-events: none; transition: opacity .2s;
+}
+.pay-modal-overlay.open { opacity: 1; pointer-events: all; }
+.pay-modal {
+  background: #FFFBF0; border-radius: 16px;
+  box-shadow: 0 12px 40px rgba(0,40,85,.22);
+  width: 100%; max-width: 500px;
+  padding: 26px; transform: translateY(12px); transition: transform .2s;
+  border: 1.5px solid #F5D98A;
+}
+.pay-modal-overlay.open .pay-modal { transform: translateY(0); }
+.pay-modal-top {
+  display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px;
+}
+.pay-modal-title {
+  display: flex; align-items: center; gap: 10px;
+  font-size: 15px; font-weight: 800; color: #7C3600;
+}
+.pay-modal-title svg { width: 20px; height: 20px; color: #D97706; }
+.pay-modal-close {
+  background: none; border: none; cursor: pointer;
+  color: #9A6C00; padding: 4px; border-radius: 6px; transition: background .15s;
+}
+.pay-modal-close:hover { background: rgba(0,0,0,.07); }
+.pay-modal-alert {
+  background: #FEF9EC; border: 1px solid #F5D98A; border-radius: 10px;
+  padding: 12px 14px; font-size: 12.5px; color: #78350F;
+  margin-bottom: 16px; line-height: 1.5;
+}
+.pay-modal-alert strong { font-weight: 700; }
+.pay-bank-box {
+  background: #fff; border: 1.5px solid #E8C96A; border-radius: 12px;
+  padding: 18px; display: grid; grid-template-columns: 1fr 1fr; gap: 14px;
+}
+.pay-bank-field { display: flex; flex-direction: column; gap: 3px; }
+.pay-bank-field.full { grid-column: 1 / -1; }
+.pay-bank-label {
+  font-size: 10px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: .6px; color: #B45309;
+}
+.pay-bank-value {
+  font-size: 13.5px; font-weight: 700; color: #1A2437;
+  font-family: 'DM Mono', monospace;
+}
+.pay-bank-value.big { font-size: 16px; color: #D97706; }
+.pay-modal-tip {
+  margin-top: 14px; font-size: 11.5px; color: #78350F;
+  background: #FEF3C7; border-radius: 8px; padding: 10px 12px;
+  display: flex; align-items: flex-start; gap: 8px; line-height: 1.5;
+}
+.pay-modal-tip svg { width: 15px; height: 15px; flex-shrink: 0; margin-top: 1px; color: #D97706; }
+
+/* ─── CIRCULAR PROGRESS ──────────────────────────────────────── */
+.circular-wrap { position: relative; display: flex; align-items: center; justify-content: center; }
+.circular-wrap svg { transform: rotate(-90deg); }
+.circular-text {
+  position: absolute; text-align: center;
+}
+.circular-pct { font-size: 26px; font-weight: 800; color: var(--udep-navy); line-height: 1; }
+.circular-desc { font-size: 11px; color: var(--text-muted); font-weight: 500; }
+
+/* ─── BADGE ───────────────────────────────────────────────────── */
+.badge {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 3px 10px; border-radius: 99px;
+  font-size: 11px; font-weight: 700; letter-spacing: .3px;
+}
+.badge-green  { background: var(--green-bg);  color: var(--green); }
+.badge-amber  { background: var(--amber-bg);  color: var(--amber); }
+.badge-red    { background: var(--red-bg);    color: var(--red); }
+.badge-blue   { background: #DBEAFE;          color: #1D4ED8; }
+.badge-gray   { background: #F1F5F9;          color: #475569; }
+.badge .dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+
+/* ─── BUTTONS ─────────────────────────────────────────────────── */
+.btn {
+  display: inline-flex; align-items: center; gap: 7px;
+  padding: 9px 18px; border-radius: 8px; border: none;
+  font-size: 13px; font-weight: 600; transition: all .15s;
+}
+.btn-primary { background: var(--udep-navy); color: #fff; }
+.btn-primary:hover { background: var(--udep-blue); }
+.btn-red { background: var(--udep-red); color: #fff; }
+.btn-red:hover { opacity: .9; }
+.btn-ghost { background: transparent; color: var(--text-muted); border: 1px solid var(--border); }
+.btn-ghost:hover { background: var(--bg); color: var(--text); }
+.btn-green { background: var(--green); color: #fff; }
+.btn-green:hover { opacity: .9; }
+.btn-sm { padding: 6px 12px; font-size: 12px; }
+.btn svg { width: 15px; height: 15px; }
+
+/* ─── FORM ────────────────────────────────────────────────────── */
+.form-group { display: flex; flex-direction: column; gap: 6px; margin-bottom: 16px; }
+.form-label { font-size: 13px; font-weight: 600; color: var(--text); }
+.form-hint { font-size: 11px; color: var(--text-muted); }
+.form-input {
+  padding: 10px 14px; border: 1.5px solid var(--border); border-radius: 8px;
+  font-size: 14px; color: var(--text); background: #fff;
+  transition: border-color .15s, box-shadow .15s;
+  outline: none;
+}
+.form-input:focus { border-color: var(--udep-blue); box-shadow: 0 0 0 3px rgba(0,75,147,.10); }
+.form-input.error { border-color: var(--udep-red); }
+.form-error { font-size: 11px; color: var(--udep-red); font-weight: 500; }
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+
+/* ─── STEPPER ─────────────────────────────────────────────────── */
+.stepper { display: flex; align-items: flex-start; gap: 0; margin: 20px 0; }
+.step { flex: 1; display: flex; flex-direction: column; align-items: center; position: relative; }
+.step:not(:last-child)::after {
+  content: '';
+  position: absolute; top: 15px; left: 50%; width: 100%;
+  height: 2px; background: var(--border); z-index: 0;
+}
+.step.done:not(:last-child)::after { background: var(--green); }
+.step.active:not(:last-child)::after { background: linear-gradient(90deg, var(--green) 0%, var(--border) 100%); }
+.step-dot {
+  width: 30px; height: 30px; border-radius: 50%; border: 2px solid var(--border);
+  background: #fff; display: flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 700; color: var(--text-muted);
+  position: relative; z-index: 1; transition: all .2s;
+}
+.step.done .step-dot { background: var(--green); border-color: var(--green); color: #fff; }
+.step.active .step-dot { background: var(--udep-blue); border-color: var(--udep-blue); color: #fff; box-shadow: 0 0 0 4px rgba(0,75,147,.15); }
+.step-label { font-size: 10px; font-weight: 600; color: var(--text-muted); text-align: center; margin-top: 6px; line-height: 1.3; max-width: 70px; }
+.step.active .step-label { color: var(--udep-blue); }
+.step.done .step-label { color: var(--green); }
+
+/* ─── TABLE ───────────────────────────────────────────────────── */
+.table-wrap { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; }
+th {
+  background: var(--bg); padding: 10px 14px;
+  font-size: 11px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: .5px; color: var(--text-muted);
+  text-align: left; border-bottom: 1px solid var(--border);
+}
+td { padding: 12px 14px; font-size: 13px; border-bottom: 1px solid var(--surface2); }
+tr:last-child td { border-bottom: none; }
+tr:hover td { background: var(--bg); }
+
+/* ─── FILTER BAR ──────────────────────────────────────────────── */
+.filter-bar { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; align-items: center; }
+.filter-chip {
+  padding: 5px 14px; border-radius: 99px; font-size: 12px; font-weight: 600;
+  border: 1.5px solid var(--border); background: #fff; color: var(--text-muted);
+  cursor: pointer; transition: all .15s;
+}
+.filter-chip.active { border-color: var(--udep-blue); background: var(--udep-blue); color: #fff; }
+
+/* ─── ALERT BOX ───────────────────────────────────────────────── */
+.alert {
+  padding: 14px 16px; border-radius: 10px;
+  display: flex; gap: 12px; align-items: flex-start;
+  font-size: 13px; margin-bottom: 16px;
+}
+.alert-amber { background: var(--amber-bg); border: 1px solid #FCD34D; color: #78350F; }
+.alert-red   { background: var(--red-bg);   border: 1px solid #FCA5A5; color: #7F1D1D; }
+.alert-green { background: var(--green-bg); border: 1px solid #86EFAC; color: #14532D; }
+.alert-blue  { background: #DBEAFE; border: 1px solid #93C5FD; color: #1E3A8A; }
+.alert svg   { width: 18px; height: 18px; flex-shrink: 0; margin-top: 1px; }
+
+/* ─── CREDITS CALC ───────────────────────────────────────────── */
+.calc-row { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; }
+.calc-row .label { flex: 1; font-size: 13px; color: var(--text); }
+.calc-row .val { font-family: 'DM Mono', monospace; font-size: 14px; font-weight: 500; color: var(--udep-navy); min-width: 60px; text-align: right; }
+.divider { border: none; border-top: 1px solid var(--border); margin: 12px 0; }
+.progress-bar-outer { height: 10px; border-radius: 99px; background: var(--bg); border: 1px solid var(--border); overflow: hidden; }
+.progress-bar-inner { height: 100%; border-radius: 99px; background: var(--udep-blue); transition: width .4s; }
+.progress-bar-inner.warn { background: var(--amber); }
+.progress-bar-inner.full { background: var(--green); }
+
+/* ─── UPLOAD ZONE ─────────────────────────────────────────────── */
+.upload-zone {
+  border: 2px dashed var(--border); border-radius: 10px;
+  padding: 24px; text-align: center; cursor: pointer;
+  transition: all .2s; background: var(--bg);
+}
+.upload-zone:hover { border-color: var(--udep-blue); background: #EBF0F8; }
+.upload-zone .upload-icon { color: var(--text-muted); margin-bottom: 8px; }
+.upload-zone p { font-size: 13px; color: var(--text-muted); }
+.upload-zone strong { color: var(--udep-blue); }
+
+/* ─── MODAL ───────────────────────────────────────────────────── */
+.modal-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,.45);
+  z-index: 200; display: flex; align-items: center; justify-content: center;
+  opacity: 0; pointer-events: none; transition: opacity .2s;
+}
+.modal-overlay.open { opacity: 1; pointer-events: all; }
+.modal {
+  background: var(--surface); border-radius: 16px;
+  box-shadow: var(--shadow-lg); width: 100%; max-width: 640px;
+  padding: 28px; transform: translateY(10px); transition: transform .2s;
+  max-height: 90vh; overflow-y: auto;
+}
+.modal-overlay.open .modal { transform: translateY(0); }
+.modal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+.modal-title { font-size: 17px; font-weight: 800; color: var(--udep-navy); }
+.modal-close { background: none; border: none; color: var(--text-muted); cursor: pointer; padding: 4px; }
+.modal-close:hover { color: var(--text); }
+
+/* ─── NOTIFICATION BELL ──────────────────────────────────────── */
+.notif-btn {
+  position: relative; background: none; border: none;
+  color: var(--text-muted); padding: 6px; border-radius: 8px;
+  cursor: pointer; transition: all .15s; display: flex; align-items: center;
+}
+.notif-btn:hover { background: var(--bg); color: var(--udep-navy); }
+.notif-badge {
+  position: absolute; top: 2px; right: 2px;
+  width: 16px; height: 16px; border-radius: 50%;
+  background: var(--udep-red); color: #fff;
+  font-size: 9px; font-weight: 800;
+  display: flex; align-items: center; justify-content: center;
+  border: 2px solid #fff;
+}
+.notif-badge.hidden { display: none !important; }
+.notif-panel {
+  position: absolute; top: calc(100% + 8px); right: 0;
+  width: 340px; background: var(--surface);
+  border-radius: var(--radius); box-shadow: var(--shadow-lg);
+  border: 1px solid var(--border); z-index: 300;
+  overflow: hidden; display: none;
+}
+.notif-panel.open { display: block; }
+.notif-panel-header {
+  padding: 14px 16px; border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+}
+.notif-panel-title { font-size: 13px; font-weight: 700; color: var(--udep-navy); }
+.notif-mark-all { font-size: 11px; color: var(--udep-blue); cursor: pointer; background: none; border: none; font-weight: 600; }
+.notif-item {
+  padding: 12px 16px; border-bottom: 1px solid var(--surface2);
+  cursor: pointer; transition: background .12s;
+  display: flex; gap: 10px; align-items: flex-start;
+}
+.notif-item:hover { background: var(--bg); }
+.notif-item.unread { background: #EBF4FF; }
+.notif-item.unread:hover { background: #dbeafe; }
+.notif-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--udep-blue); flex-shrink: 0; margin-top: 5px; }
+.notif-dot.read { background: transparent; border: 1.5px solid var(--border); }
+.notif-text { font-size: 12px; color: var(--text); line-height: 1.4; flex: 1; }
+.notif-time { font-size: 10px; color: var(--text-muted); margin-top: 2px; }
+.notif-wrap { position: relative; }
+
+/* ─── COMMENT / CHAT THREAD ──────────────────────────────────── */
+.chat-thread { display: flex; flex-direction: column; gap: 10px; max-height: 220px; overflow-y: auto; padding: 12px; background: var(--bg); border-radius: 8px; border: 1px solid var(--border); }
+.chat-msg { display: flex; flex-direction: column; gap: 2px; max-width: 85%; }
+.chat-msg.from-admin { align-self: flex-start; }
+.chat-msg.from-alumno { align-self: flex-end; }
+.chat-bubble {
+  padding: 8px 12px; border-radius: 10px; font-size: 12px; line-height: 1.4;
+}
+.chat-msg.from-admin .chat-bubble { background: #fff; border: 1px solid var(--border); color: var(--text); border-bottom-left-radius: 3px; }
+.chat-msg.from-alumno .chat-bubble { background: var(--udep-blue); color: #fff; border-bottom-right-radius: 3px; }
+.chat-meta { font-size: 10px; color: var(--text-muted); }
+.chat-msg.from-alumno .chat-meta { text-align: right; }
+.chat-input-row { display: flex; gap: 8px; margin-top: 8px; }
+.chat-input-row input { flex: 1; }
+
+/* ─── AUDIT LOG ──────────────────────────────────────────────── */
+.audit-log { display: flex; flex-direction: column; gap: 0; }
+.audit-entry { display: flex; gap: 12px; align-items: flex-start; padding: 10px 0; border-bottom: 1px solid var(--surface2); }
+.audit-entry:last-child { border-bottom: none; }
+.audit-icon { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.audit-icon.created { background: #DBEAFE; color: var(--udep-blue); }
+.audit-icon.approved { background: var(--green-bg); color: var(--green); }
+.audit-icon.rejected { background: var(--red-bg); color: var(--red); }
+.audit-icon.pending  { background: var(--amber-bg); color: var(--amber); }
+.audit-icon.chat  { background: #F3E8FF; color: #7C3AED; }
+.audit-icon.payment  { background: var(--amber-bg); color: var(--amber); }
+.audit-body { flex: 1; }
+.audit-action { font-size: 12px; font-weight: 600; color: var(--text); }
+.audit-detail { font-size: 11px; color: var(--text-muted); margin-top: 1px; }
+.audit-by { font-size: 11px; color: var(--udep-blue); font-weight: 600; }
+
+/* ─── EXCEPTION BADGE (fuera de plazo) ──────────────────────── */
+.out-of-date-badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  background: #FFF7ED; border: 1px solid #FDBA74;
+  color: #C2410C; font-size: 10px; font-weight: 700;
+  padding: 2px 7px; border-radius: 99px;
+}
+
+/* ─── TOAST ───────────────────────────────────────────────────── */
+#toast-container { position: fixed; bottom: 24px; right: 24px; z-index: 999; display: flex; flex-direction: column; gap: 8px; }
+.toast {
+  background: var(--udep-navy); color: #fff;
+  padding: 12px 18px; border-radius: 10px;
+  font-size: 13px; font-weight: 500;
+  box-shadow: var(--shadow-lg);
+  display: flex; align-items: center; gap: 10px;
+  animation: slideIn .25s ease;
+}
+.toast.success { background: var(--green); }
+.toast.error   { background: var(--udep-red); }
+@keyframes slideIn { from { transform: translateX(30px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+
+/* ─── MISC ────────────────────────────────────────────────────── */
+.section-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+.tag-list { display: flex; gap: 6px; flex-wrap: wrap; }
+.empty-state { text-align: center; padding: 40px 20px; color: var(--text-muted); }
+.empty-state svg { margin-bottom: 12px; opacity: .4; }
+.empty-state p { font-size: 14px; }
+.action-group { display: flex; gap: 6px; }
+.hidden { display: none !important; }
+
+/* ─── RESPONSIVE ─────────────────────────────────────────────── */
+@media (max-width: 900px) {
+  .sidebar { width: 70px; min-width: 70px; }
+  .sidebar-logo .logo-sub { display: none; }
+  .nav-item span { display: none; }
+  .nav-item { padding: 14px 8px; flex: 0 0 auto; }
+  .user-info { display: none; }
+  .main { margin-left: 70px; }
+  .grid2, .grid3, .grid4 { grid-template-columns: 1fr; }
+  .form-grid { grid-template-columns: 1fr; }
+  .content { padding: 20px 16px; }
+}
+</style>
+</head>
+<body>
+
+<div class="app">
+  <!-- ─── SIDEBAR ─────────────────────────────────────────── -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <span class="logo-badge">UDEP</span>
+      <span class="logo-sub">Alumno CLC</span>
+    </div>
+    <nav class="sidebar-nav" id="sidebarNav">
+      <!-- items injected by JS -->
+    </nav>
+    <div class="sidebar-bottom">
+      <div class="user-chip">
+        <div class="user-avatar" id="userAvatar">AL</div>
+        <div class="user-info">
+          <div class="user-name" id="userName">Eduardo Joao Sánchez Farías</div>
+          <div class="user-role" id="userRole">Alumno - Ingeniería</div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ─── MAIN ────────────────────────────────────────────── -->
+  <div class="main">
+    <!-- Topbar -->
+    <div class="topbar">
+      <span class="topbar-title" id="topbarTitle">Dashboard</span>
+      <div class="topbar-actions">
+        <div class="notif-wrap" id="notifWrap">
+          <button class="notif-btn" onclick="toggleNotifPanel()" title="Notificaciones">
+            <i data-lucide="bell" style="width:20px;height:20px"></i>
+            <span class="notif-badge" id="notifBadge">3</span>
+          </button>
+          <div class="notif-panel" id="notifPanel">
+            <div class="notif-panel-header">
+              <span class="notif-panel-title">Notificaciones</span>
+              <button class="notif-mark-all" onclick="markAllRead()">Marcar todas como leídas</button>
+            </div>
+            <div id="notifList"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Content -->
+    <div class="content">
+
+      <!-- ══════════════ VISTA ALUMNO: DASHBOARD ═══════════════ -->
+      <div class="view active" id="view-dashboard">
+        <div class="page-title">Convalidación de Créditos de Libre Configuración</div>
+        <div class="page-sub">Seguimiento de tus créditos de libre configuración</div>
+
+        <!-- Stats row -->
+        <div class="grid3" style="margin-bottom:20px" id="studentStats"></div>
+
+        <!-- Progress + timeline -->
+        <div class="grid2" style="margin-bottom:20px">
+          <!-- Circular progress -->
+          <div class="card">
+            <div class="card-header"><span class="card-title">Créditos Acumulados</span></div>
+            <div style="display:flex;align-items:center;gap:24px;flex-wrap:wrap">
+              <div class="circular-wrap" style="width:140px;height:140px">
+                <svg width="140" height="140" viewBox="0 0 140 140">
+                  <circle cx="70" cy="70" r="58" fill="none" stroke="#EBF0F8" stroke-width="12"/>
+                  <circle id="circleBar" cx="70" cy="70" r="58" fill="none"
+                    stroke="#004B93" stroke-width="12"
+                    stroke-dasharray="364.4" stroke-dashoffset="364.4"
+                    stroke-linecap="round" style="transition:stroke-dashoffset .6s ease"/>
+                </svg>
+                <div class="circular-text">
+                  <div class="circular-pct" id="circleLabel">0</div>
+                  <div class="circular-desc">de <span id="circleMax">4</span> CL</div>
+                </div>
+              </div>
+              <div style="flex:1">
+                <div id="creditDetails"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Calculadora rápida -->
+          <div class="card">
+            <div class="card-header"><span class="card-title">Calculadora de Créditos</span></div>
+            <div class="form-group" style="margin-bottom:10px">
+              <label class="form-label" style="font-size:12px">Tipo de actividad</label>
+              <select class="form-input" id="calcType" onchange="recalc()">
+                <option value="teorica">Teórica (16h = 1 CL)</option>
+                <option value="practica">Práctica (32h = 1 CL)</option>
+              </select>
+            </div>
+            <div class="form-group" style="margin-bottom:10px">
+              <label class="form-label" style="font-size:12px">Horas certificadas</label>
+              <input type="number" class="form-input" id="calcHoras" value="0" min="0" oninput="recalc()" />
+            </div>
+            <div class="card" style="background:var(--bg);padding:12px;border:none;box-shadow:none">
+              <div class="calc-row"><span class="label">Créditos equivalentes</span><span class="val" id="calcResult">0.00 CL</span></div>
+              <div class="calc-row"><span class="label">Créditos ya acumulados</span><span class="val" id="calcAccum">0.00 CL</span></div>
+              <hr class="divider"/>
+              <div class="calc-row"><span class="label" style="font-weight:700">Total proyectado</span><span class="val" id="calcTotal" style="color:var(--udep-red)">0.00 CL</span></div>
+            </div>
+            <div id="calcAlert" style="margin-top:8px"></div>
+          </div>
+        </div>
+
+        <!-- Timeline solicitudes -->
+        <div class="card">
+          <div class="section-row">
+            <span class="card-title">Mis Solicitudes</span>
+            <button class="btn btn-primary btn-sm" onclick="navigate('nueva')">
+              <i data-lucide="plus"></i> Nueva Solicitud
+            </button>
+          </div>
+          <div id="requestList"></div>
+        </div>
+      </div>
+
+      <!-- ══════════════ VISTA ALUMNO: NUEVA SOLICITUD ═════════ -->
+      <div class="view" id="view-nueva">
+        <div class="page-title">Nueva solicitud de convalidación</div>
+        <div class="page-sub">Completa el formulario para registrar tu actividad CLC</div>
+
+        <div class="grid2">
+          <!-- Formulario -->
+          <div>
+            <div class="card" style="margin-bottom:20px">
+              <div class="card-header"><span class="card-title">Datos de la Actividad</span></div>
+              <!-- Selector CL -->
+              <div class="form-group" style="margin-bottom:16px">
+                <label class="form-label">¿Qué CL deseas convalidar?</label>
+                <p class="form-hint" style="margin-bottom:8px">Teniendo en cuenta la tabla y los CLs disponibles en tu malla, selecciona el CL que deseas convalidar con esta actividad.</p>
+                <select class="form-input" id="fCLElegido" onchange="validateForm()">
+                  <option value="">-- Selecciona un CL --</option>
+                  <option value="CL1 (ING-ARQ)">CL1 (ING-ARQ)</option>
+                  <option value="CL2 (ING-ARQ)">CL2 (ING-ARQ)</option>
+                  <option value="CL3 (ING-ARQ)">CL3 (ING-ARQ)</option>
+                  <option value="CL4 (ING-ARQ)">CL4 (ING-ARQ)</option>
+                  <option value="CL5 (ARQ)">CL5 (ARQ)</option>
+                  <option value="CL6 (ARQ)">CL6 (ARQ)</option>
+                  <option value="CL7 (ARQ)">CL7 (ARQ)</option>
+                  <option value="CL8 (ARQ)">CL8 (ARQ)</option>
+                </select>
+                <span class="form-error hidden" id="errCL">Selecciona el CL que deseas convalidar</span>
+              </div>
+
+              <div class="form-grid">
+                <div class="form-group">
+                  <label class="form-label">Nombre completo de la actividad</label>
+                  <input type="text" class="form-input" id="fNombre" placeholder="Ej. Curso de Innovación" oninput="validateForm()"/>
+                  <span class="form-error hidden" id="errNombre">Campo requerido</span>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Institución organizadora</label>
+                  <input type="text" class="form-input" id="fInstitucion" placeholder="Ej. CONCYTEC" oninput="validateForm()"/>
+                </div>
+              </div>
+
+              <div class="form-grid">
+                <div class="form-group">
+                  <label class="form-label">Procedencia</label>
+                  <select class="form-input" id="fProcedencia" onchange="checkPago(); validateForm()">
+                    <option value="interna">Interna (UDEP)</option>
+                    <option value="externa">Externa</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Tipo de actividad</label>
+                  <select class="form-input" id="fTipo" onchange="validateForm()">
+                    <option value="intercambio">Curso de intercambio estudiantil</option>
+                    <option value="extension">Actividades y cursos de extensión organizados por la facultad de Ingeniería</option>
+                    <option value="vida_universitaria">Actividades de Vida Universitaria</option>
+                    <option value="externos">Actividades externas a la facultad de Ingeniería</option>
+                    <option value="congreso">Congresos</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="form-grid">
+                <div class="form-group">
+                  <label class="form-label">¿Curso evaluado con nota?</label>
+                  <select class="form-input" id="fModalidad" onchange="calcHorasLive(); validateForm()">
+                    <option value="teorica">Sí</option>
+                    <option value="practica">No</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Horas certificadas</label>
+                  <input type="number" class="form-input" id="fHoras" min="1" placeholder="0" oninput="calcHorasLive(); validateForm()"/>
+                  <span class="form-error hidden" id="errHoras">Mínimo 1 hora</span>
+                </div>
+              </div>
+
+            </div>
+
+            <!-- Upload certificado -->
+            <div class="card" style="margin-bottom:20px">
+              <div class="card-header"><span class="card-title">Certificado / Constancia</span></div>
+              <div class="upload-zone" onclick="simulateUpload()" id="uploadZone">
+                <div class="upload-icon" style="display:flex;justify-content:center"><i data-lucide="upload-cloud" style="width:36px;height:36px"></i></div>
+                <p><strong>Haz clic para adjuntar</strong> tu certificado en PDF</p>
+                <p style="font-size:11px;margin-top:4px">Solo PDF · máx. 5 MB</p>
+                <p style="font-size:10px;margin-top:6px;color:var(--udep-blue);font-weight:600">El nombre se formateará automáticamente: SIGLAS - APELLIDOS_NOMBRES_CURSO.pdf</p>
+              </div>
+              <div id="fileUploaded" class="hidden" style="display:flex;align-items:center;gap:10px;padding:12px 14px;background:var(--green-bg);border-radius:8px;border:1px solid #86EFAC;margin-top:10px">
+                <i data-lucide="file-check" style="color:var(--green);flex-shrink:0"></i>
+                <div style="flex:1;min-width:0">
+                  <span class="uploaded-filename" style="font-size:13px;color:var(--green);font-weight:600;word-break:break-all"></span>
+                  <div style="font-size:11px;color:var(--green);opacity:0.75;margin-top:2px">Nombre formateado automáticamente · PDF listo para enviar</div>
+                </div>
+                <button onclick="removeFile()" style="margin-left:4px;background:none;border:none;color:var(--green);cursor:pointer;flex-shrink:0"><i data-lucide="x"></i></button>
+              </div>
+            </div>
+
+            <div style="display:flex;gap:10px">
+              <button class="btn btn-primary" id="btnEnviar" onclick="submitForm()" disabled>
+                <i data-lucide="send"></i> Enviar Solicitud
+              </button>
+              <button class="btn btn-ghost" onclick="navigate('dashboard')">Cancelar</button>
+            </div>
+          </div>
+
+          <!-- Panel lateral informativo -->
+          <div>
+            <!-- Tabla de convalidación por tipo -->
+            <div class="card" style="margin-bottom:16px;padding:0;overflow:hidden">
+              <div style="background:var(--udep-navy);padding:16px 20px;display:flex;align-items:center;gap:10px">
+                <i data-lucide="table-2" style="width:18px;height:18px;color:var(--udep-gold);flex-shrink:0"></i>
+                <span style="font-size:13px;font-weight:700;color:#fff;text-transform:uppercase;letter-spacing:.6px">Tabla de Convalidación CLC</span>
+              </div>
+              <div style="padding:16px 20px">
+                <p style="font-size:12px;color:var(--text-muted);margin-bottom:16px;line-height:1.5">Consulta qué tipos de actividad pueden convalidar en cada crédito según tu carrera.</p>
+
+                <div style="margin-bottom:18px">
+                  <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+                    <span style="display:inline-flex;align-items:center;justify-content:center;background:var(--udep-blue);color:#fff;font-size:10px;font-weight:800;border-radius:6px;padding:3px 8px;letter-spacing:.4px">INGENIERÍA</span>
+                  </div>
+                  <div style="border-radius:10px;overflow:hidden;border:1px solid var(--border);box-shadow:0 1px 4px rgba(0,40,85,.07)">
+                    <img src="CLC Ingenieria.png" alt="Tabla de convalidacion Ingenieria" style="width:100%;display:block">
+                  </div>
+                </div>
+
+                <div style="margin-bottom:18px">
+                  <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+                    <span style="display:inline-flex;align-items:center;justify-content:center;background:#7C3AED;color:#fff;font-size:10px;font-weight:800;border-radius:6px;padding:3px 8px;letter-spacing:.4px">ARQUITECTURA</span>
+                  </div>
+                  <div style="border-radius:10px;overflow:hidden;border:1px solid var(--border);box-shadow:0 1px 4px rgba(0,40,85,.07)">
+                    <img src="CLC Arquitectura.png" alt="Tabla de convalidacion Arquitectura" style="width:100%;display:block">
+                  </div>
+                </div>
+
+                <div style="background:var(--surface2);border-radius:8px;padding:10px 14px;display:flex;flex-direction:column;gap:6px">
+                  <div style="font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px">Regla de equivalencia</div>
+                  <div style="display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text)">
+                    <span style="background:var(--green-bg);color:var(--green);padding:2px 8px;border-radius:6px;font-weight:700;font-size:11px">Con nota</span>
+                    <span>16 horas certificadas = <strong>1 CL</strong></span>
+                  </div>
+                  <div style="display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text)">
+                    <span style="background:var(--amber-bg);color:var(--amber);padding:2px 8px;border-radius:6px;font-weight:700;font-size:11px">Sin nota</span>
+                    <span>32 horas certificadas = <strong>1 CL</strong></span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Flujo de estados -->
+            <div class="card">
+              <div class="card-header"><span class="card-title">Flujo de Aprobación</span></div>
+              <div style="display:flex;flex-direction:column;gap:8px;font-size:12px">
+                <div style="display:flex;gap:8px;align-items:center"><span style="width:20px;height:20px;border-radius:50%;background:var(--udep-blue);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;flex-shrink:0">1</span> Registro de solicitud</div>
+                <div style="width:1px;height:12px;background:var(--border);margin-left:10px"></div>
+                <div style="display:flex;gap:8px;align-items:center"><span style="width:20px;height:20px;border-radius:50%;background:var(--udep-blue);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;flex-shrink:0">2</span> Validación de formato</div>
+                <div style="width:1px;height:12px;background:var(--border);margin-left:10px"></div>
+                <div style="display:flex;gap:8px;align-items:center"><span style="width:20px;height:20px;border-radius:50%;background:var(--udep-blue);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;flex-shrink:0">3</span> Subsanación de errores</div>
+                <div style="width:1px;height:12px;background:var(--border);margin-left:10px"></div>
+                <div style="display:flex;gap:8px;align-items:center"><span style="width:20px;height:20px;border-radius:50%;background:var(--amber);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;flex-shrink:0">4</span> Pago (solo externas)</div>
+                <div style="width:1px;height:12px;background:var(--border);margin-left:10px"></div>
+                <div style="display:flex;gap:8px;align-items:center"><span style="width:20px;height:20px;border-radius:50%;background:var(--green);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;flex-shrink:0">5</span> Registro final en SIGA</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div><!-- /content -->
+  </div><!-- /main -->
+</div><!-- /app -->
+
+<!-- ─── MODAL DETALLE ───────────────────────────────────────────── -->
+<div class="modal-overlay" id="detailModal">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title" id="modalTitle">Detalle de Solicitud</span>
+      <button class="modal-close" onclick="closeModal()"><i data-lucide="x"></i></button>
+    </div>
+    <div id="modalBody"></div>
+    <div style="display:flex;gap:10px;margin-top:20px;justify-content:flex-end" id="modalActions"></div>
+  </div>
+</div>
+
+<!-- ─── PAYMENT BANK DATA MODAL ──────────────────────────────── -->
+<div class="pay-modal-overlay" id="payBankModal" onclick="if(event.target===this)closePayModal()">
+  <div class="pay-modal">
+    <div class="pay-modal-top">
+      <div class="pay-modal-title">
+        <i data-lucide="landmark"></i>
+        DATOS PARA TRANSFERENCIA BANCARIA
+      </div>
+      <button class="pay-modal-close" onclick="closePayModal()">
+        <i data-lucide="x" style="width:18px;height:18px"></i>
+      </button>
+    </div>
+    <div class="pay-modal-alert">
+      <strong>Pago requerido:</strong> Esta actividad externa requiere el pago de <strong>S/ 135.00</strong>. Realiza el pago en línea y adjunta la captura como comprobante al momento de que el sistema te lo solicite.
+    </div>
+    <div class="pay-bank-box">
+      <div class="pay-bank-field">
+        <span class="pay-bank-label">Banco</span>
+        <span class="pay-bank-value">BBVA Perú</span>
+      </div>
+      <div class="pay-bank-field">
+        <span class="pay-bank-label">Tipo de Cuenta</span>
+        <span class="pay-bank-value">Corriente en Soles</span>
+      </div>
+      <div class="pay-bank-field">
+        <span class="pay-bank-label">N° de Cuenta</span>
+        <span class="pay-bank-value">0011-0175-0100042318</span>
+      </div>
+      <div class="pay-bank-field">
+        <span class="pay-bank-label">CCI (Interbancario)</span>
+        <span class="pay-bank-value">011-175-000100042318-14</span>
+      </div>
+      <div class="pay-bank-field full">
+        <span class="pay-bank-label">Titular de la Cuenta</span>
+        <span class="pay-bank-value">Universidad de Piura – UDEP</span>
+      </div>
+      <div class="pay-bank-field">
+        <span class="pay-bank-label">RUC</span>
+        <span class="pay-bank-value">20131580826</span>
+      </div>
+      <div class="pay-bank-field">
+        <span class="pay-bank-label">Monto a Pagar</span>
+        <span class="pay-bank-value big">S/ 135.00</span>
+      </div>
+    </div>
+    <div class="pay-modal-tip">
+      <i data-lucide="info"></i>
+      <span>En el concepto de la transferencia escribe tu <strong>código de alumno</strong> y el texto <strong>"Convalidación CLC"</strong>. Conserva el comprobante; deberás adjuntarlo cuando el director lo solicite.</span>
+    </div>
+  </div>
+</div>
+
+<!-- ─── TOAST CONTAINER ─────────────────────────────────────────── -->
+<div id="toast-container"></div>
+
+<script>
+if (typeof lucide === 'undefined') {
+  window.lucide = { createIcons: function() { console.warn("Íconos no cargados"); } };
+}
+/* ═══════════════════════════════════════════════════════════
+   DATA STORE – Simulated database
+═══════════════════════════════════════════════════════════ */
+
+// Current user (alumno mode)
+const currentUser = {
+  nombre: 'Eduardo Joao Sánchez Farías',
+  carrera: 'Ingeniería',   // 'Ingeniería' | 'Arquitectura'
+  topeCreditos: 4,         // Calculado según carrera
+  initials: 'AL'
+};
+
+// Notificaciones simuladas
+let notifications = [
+  { id: 'n1', text: 'Tu solicitud CLC-2024-001 (Congreso Nacional de Robótica) fue <strong>Aprobada</strong>.', time: 'Hace 2 días', unread: true, solicitudId: 'CLC-2024-001' },
+  { id: 'n2', text: 'Tu solicitud CLC-2024-002 (Taller de Liderazgo) está <strong>En Revisión</strong> por el director.', time: 'Hace 4 horas', unread: true, solicitudId: 'CLC-2024-002' },
+  { id: 'n3', text: 'Tu solicitud CLC-2024-003 requiere <strong>Pago pendiente</strong>. Realiza el pago y sube tu comprobante.', time: 'Hace 1 hora', unread: true, solicitudId: 'CLC-2024-003' },
+];
+
+// Estado de solicitudes simuladas
+let solicitudes = [
+  {
+    id: 'CLC-2024-001', alumno: 'Eduardo Joao Sánchez Farías', carrera: 'Ingeniería',
+    actividad: 'Congreso Nacional de Robótica',
+    institucion: 'IEEE Perú', tipo: 'congreso', modalidad: 'practica',
+    horas: 32, cl: 1, procedencia: 'externa',
+    fechaInicio: '2024-03-10', fechaFin: '2024-03-12',
+    estado: 'Aprobado', etapa: 5,
+    descripcion: 'Congreso organizado por IEEE Sección Perú.',
+    archivo: 'cert_ieee_congreso.pdf',
+    comprobante: null,
+    fueraPlazos: false,
+    observacion: 'Documentación completa y válida.',
+    auditLog: [
+      { tipo: 'created', accion: 'Solicitud registrada', usuario: 'Eduardo Joao Sánchez Farías', fecha: '10/03/2024 09:15', detalle: 'Nueva solicitud enviada' },
+      { tipo: 'pending', accion: 'Validación de formato', usuario: 'Sistema', fecha: '11/03/2024 08:00', detalle: 'Validación automática OK' },
+      { tipo: 'approved', accion: 'Aprobación académica', usuario: 'Dr. Pedro Vega', fecha: '12/03/2024 10:30', detalle: 'Documentación completa y válida.' },
+    ],
+    chat: [
+      { de: 'admin', nombre: 'Dr. Pedro Vega', texto: 'La documentación está en orden. Felicitaciones por participar en el congreso.', hora: '12/03 10:32' },
+      { de: 'alumno', nombre: 'Eduardo Sánchez', texto: 'Muchas gracias, Dr. Vega!', hora: '12/03 11:05' },
+    ]
+  },
+  {
+    id: 'CLC-2024-002', alumno: 'Eduardo Joao Sánchez Farías', carrera: 'Ingeniería',
+    actividad: 'Taller de Liderazgo UDEP',
+    institucion: 'UDEP – Bienestar', tipo: 'vida_universitaria', modalidad: 'teorica',
+    horas: 16, cl: 1, procedencia: 'interna',
+    fechaInicio: '2024-04-01', fechaFin: '2024-04-05',
+    estado: 'En Revisión', etapa: 1,
+    descripcion: 'Taller semestral de liderazgo estudiantil.',
+    archivo: 'constancia_liderazgo.pdf',
+    comprobante: null,
+    fueraPlazos: false,
+    observacion: '',
+    auditLog: [
+      { tipo: 'created', accion: 'Solicitud registrada', usuario: 'Eduardo Joao Sánchez Farías', fecha: '01/04/2024 08:45', detalle: 'Nueva solicitud enviada' },
+      { tipo: 'pending', accion: 'Validación de formato', usuario: 'Secretaría', fecha: '01/04/2024 14:00', detalle: 'En espera de revisión académica' },
+    ],
+    chat: [
+      { de: 'admin', nombre: 'Secretaría', texto: 'Hemos recibido tu solicitud. Estamos validando el formato del certificado.', hora: '01/04 14:05' },
+    ]
+  },
+  {
+    id: 'CLC-2024-003', alumno: 'Eduardo Joao Sánchez Farías', carrera: 'Ingeniería',
+    actividad: 'Voluntariado Ambiental',
+    institucion: 'ONG EcoPerú', tipo: 'externos', modalidad: 'practica',
+    horas: 64, cl: 2, procedencia: 'externa',
+    fechaInicio: '2024-02-01', fechaFin: '2024-02-28',
+    estado: 'Pago pendiente', etapa: 3,
+    descripcion: 'Reforestación en zona de Piura.',
+    archivo: 'vol_ecoperu.pdf',
+    comprobante: null,
+    fueraPlazos: false,
+    observacion: '',
+    auditLog: [
+      { tipo: 'created', accion: 'Solicitud registrada', usuario: 'Eduardo Joao Sánchez Farías', fecha: '02/02/2024 09:00', detalle: 'Nueva solicitud enviada' },
+      { tipo: 'approved', accion: 'Aprobación académica', usuario: 'Dr. Pedro Vega', fecha: '10/02/2024 11:00', detalle: 'Actividad válida. Procede pago en caja.' },
+      { tipo: 'pending', accion: 'Pago pendiente', usuario: 'Sistema', fecha: '10/02/2024 11:01', detalle: 'Solicitud derivada a caja para pago S/ 135.00' },
+    ],
+    chat: []
+  },
+  {
+    id: 'CLC-2024-004', alumno: 'María Torres', carrera: 'Ingeniería',
+    actividad: 'Curso de Python para Ingenieros',
+    institucion: 'Platzi', tipo: 'externos', modalidad: 'teorica',
+    horas: 8, cl: 0, procedencia: 'externa',
+    fechaInicio: '2024-01-10', fechaFin: '2024-01-20',
+    estado: 'Rechazado', etapa: 1,
+    descripcion: 'Curso en plataforma Platzi.',
+    archivo: 'cert_platzi.pdf',
+    comprobante: null,
+    fueraPlazos: true,
+    observacion: 'Horas insuficientes (8h < 16h mínimo). Solicitud fuera de plazo ordinario.',
+    auditLog: [
+      { tipo: 'created', accion: 'Solicitud registrada', usuario: 'María Torres', fecha: '20/01/2024 16:00', detalle: 'Solicitud ingresada fuera de plazo ordinario' },
+      { tipo: 'rejected', accion: 'Rechazado', usuario: 'Dr. Pedro Vega', fecha: '22/01/2024 09:20', detalle: 'Horas insuficientes (8h < 16h mínimo). Solicitud fuera de plazo ordinario.' },
+    ],
+    chat: [
+      { de: 'admin', nombre: 'Dr. Pedro Vega', texto: 'El curso no cumple el mínimo de 16 horas requeridas. Además, la solicitud fue ingresada fuera del plazo ordinario.', hora: '22/01 09:22' },
+    ]
+  },
+  {
+    id: 'CLC-2024-005', alumno: 'Luis Sánchez', carrera: 'Arquitectura',
+    actividad: 'Taller de Acuarela Arquitectónica',
+    institucion: 'UDEP – Arte', tipo: 'extension', modalidad: 'practica',
+    horas: 32, cl: 1, procedencia: 'interna',
+    fechaInicio: '2024-05-01', fechaFin: '2024-05-15',
+    estado: 'Aprobado', etapa: 5,
+    descripcion: 'Taller impartido por la Facultad de Arte UDEP.',
+    archivo: 'constancia_acuarela.pdf',
+    comprobante: null,
+    fueraPlazos: false,
+    observacion: 'Actividad reconocida por la facultad.',
+    auditLog: [
+      { tipo: 'created', accion: 'Solicitud registrada', usuario: 'Luis Sánchez', fecha: '01/05/2024 10:00', detalle: 'Nueva solicitud enviada' },
+      { tipo: 'approved', accion: 'Aprobación académica', usuario: 'Dr. Pedro Vega', fecha: '08/05/2024 14:00', detalle: 'Actividad reconocida por la facultad.' },
+    ],
+    chat: []
+  }
+];
+
+let currentRole = 'alumno';
+let adminFilter = 'Todos';
+let fileAttached = false;
+
+/* ═══════════════════════════════════════════════════════════
+   NAVIGATION
+═══════════════════════════════════════════════════════════ */
+const navConfig = {
+  alumno: [
+    { id: 'dashboard', label: 'Dashboard', icon: 'layout-dashboard' },
+    { id: 'nueva',     label: 'Nueva Solicitud', icon: 'plus-circle' },
+  ],
+  admin: [
+    { id: 'admin', label: 'Solicitudes', icon: 'inbox' },
+  ]
+};
+
+function buildSidebar() {
+  const nav = document.getElementById('sidebarNav');
+  nav.innerHTML = '';
+  const items = navConfig[currentRole] || [];
+  items.forEach(item => {
+    const div = document.createElement('div');
+    div.className = 'nav-item';
+    div.dataset.view = item.id;
+    div.innerHTML = `<i data-lucide="${item.icon}"></i><span>${item.label}</span>`;
+    div.onclick = () => navigate(item.id);
+    nav.appendChild(div);
+  });
+  lucide.createIcons();
+}
+
+function navigate(viewId) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  const view = document.getElementById('view-' + viewId);
+  if (view) view.classList.add('active');
+  const navItem = document.querySelector(`.nav-item[data-view="${viewId}"]`);
+  if (navItem) navItem.classList.add('active');
+  const titles = {
+    dashboard: 'Mi Panel CLC',
+    nueva: 'Nueva solicitud',
+    admin: 'Panel de administración'
+  };
+  document.getElementById('topbarTitle').textContent = titles[viewId] || '';
+  // Render content
+  if (viewId === 'dashboard') renderDashboard();
+  if (viewId === 'admin') renderAdmin();
+  if (viewId === 'nueva') { resetForm(); lucide.createIcons(); }
+  lucide.createIcons();
+}
+
+/* ═══════════════════════════════════════════════════════════
+   CREDIT LOGIC
+   - Teórica:  16h = 1 CL
+   - Práctica: 32h = 1 CL
+   - Tope Ingeniería: 4 CL | Arquitectura: 8 CL
+═══════════════════════════════════════════════════════════ */
+function calcCreditos(horas, modalidad) {
+  const divisor = modalidad === 'practica' ? 32 : 16;
+  return Math.floor(horas / divisor);
+}
+
+function calcCreditosReal(horas, modalidad) {
+  const divisor = modalidad === 'practica' ? 32 : 16;
+  return horas / divisor;
+}
+
+function getMisCL() {
+  return solicitudes
+    .filter(s => s.alumno === 'Eduardo Joao Sánchez Farías' && s.estado === 'Aprobado')
+    .reduce((sum, s) => sum + s.cl, 0);
+}
+
+/* ═══════════════════════════════════════════════════════════
+   DASHBOARD RENDER
+═══════════════════════════════════════════════════════════ */
+function renderDashboard() {
+  const misSolicitudes = solicitudes.filter(s => s.alumno === 'Eduardo Joao Sánchez Farías');
+  const aprobadas = misSolicitudes.filter(s => s.estado === 'Aprobado');
+  const enProceso = misSolicitudes.filter(s => !['Aprobado','Rechazado'].includes(s.estado));
+  const clAcum = getMisCL();
+  const tope = currentUser.topeCreditos;
+  const pct = Math.min(clAcum / tope, 1);
+
+  // Stats
+  document.getElementById('studentStats').innerHTML = `
+    <div class="stat-card">
+      <div class="stat-label">Créditos Aprobados</div>
+      <div class="stat-value">${clAcum}</div>
+      <div class="stat-sub">de ${tope} CL requeridos</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Solicitudes Activas</div>
+      <div class="stat-value">${enProceso.length}</div>
+      <div class="stat-sub">en proceso de revisión</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Solicitudes Aprobadas</div>
+      <div class="stat-value">${aprobadas.length}</div>
+      <div class="stat-sub">historial completo</div>
+    </div>
+  `;
+
+  // Circular progress
+  const circ = 2 * Math.PI * 58; // 364.4
+  document.getElementById('circleBar').style.strokeDashoffset = circ * (1 - pct);
+  document.getElementById('circleBar').style.stroke = pct >= 1 ? 'var(--green)' : 'var(--udep-blue)';
+  document.getElementById('circleLabel').textContent = clAcum;
+  document.getElementById('circleMax').textContent = tope;
+
+  // Credit details
+  const needed = Math.max(0, tope - clAcum);
+  document.getElementById('creditDetails').innerHTML = `
+    <div style="margin-bottom:10px">
+      <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px">
+        <span style="font-weight:600;color:var(--text-muted)">Progreso</span>
+        <span style="font-weight:700;color:var(--udep-navy)">${clAcum}/${tope} CL</span>
+      </div>
+      <div class="progress-bar-outer">
+        <div class="progress-bar-inner ${pct >= 1 ? 'full' : pct >= .75 ? 'warn' : ''}" style="width:${pct*100}%"></div>
+      </div>
+    </div>
+    <div class="calc-row"><span class="label" style="font-size:12px">Créditos aprobados</span><span class="val" style="font-size:13px">${clAcum} CL</span></div>
+    <div class="calc-row"><span class="label" style="font-size:12px">Créditos restantes</span><span class="val" style="font-size:13px;color:${needed>0?'var(--amber)':'var(--green)'}">${needed} CL</span></div>
+    <div class="calc-row"><span class="label" style="font-size:12px">Tope máximo</span><span class="val" style="font-size:13px">${tope} CL</span></div>
+    ${pct >= 1 ? '<div class="badge badge-green" style="margin-top:8px"><span class="dot"></span>Requisito completado</div>' : ''}
+  `;
+
+  // Calculadora rápida sync
+  document.getElementById('calcAccum').textContent = clAcum.toFixed(2) + ' CL';
+  recalc();
+
+  // Request list
+  renderRequestList(misSolicitudes);
+  lucide.createIcons();
+}
+
+function renderRequestList(list) {
+  const container = document.getElementById('requestList');
+  if (!list.length) {
+    container.innerHTML = `<div class="empty-state"><i data-lucide="inbox" style="width:40px;height:40px"></i><p>Aún no tienes solicitudes.</p></div>`;
+    lucide.createIcons(); return;
+  }
+  container.innerHTML = list.map(s => {
+    const steps = ['Registro','Validación Formato','Subsanación de errores','Pago','Registro SIGA'];
+    // etapa 1 = registro completado, validación de formato en curso (active)
+    // Para que el registro siempre aparezca verde (done) y la validación en azul (active) al menos
+    const stepHTML = steps.map((label, i) => {
+      const idx = i + 1;
+      // etapa guarda el paso ACTUAL EN PROCESO (1-indexed).
+      // Tras enviar una solicitud, etapa=1 significa "registro hecho, ahora en validación".
+      // Mapeamos: pasos anteriores a etapa+1 son done, etapa+1 es active... excepto:
+      // etapa=1 => paso 1 done, paso 2 active
+      const doneThreshold = s.etapa; // todos los pasos <= etapa son done
+      const activeIdx = s.etapa + 1; // el siguiente paso es el activo
+      let cls = '';
+      if (idx <= doneThreshold) cls = 'done';
+      else if (idx === activeIdx) cls = 'active';
+      const icon = cls === 'done' ? '<i data-lucide="check" style="width:12px;height:12px"></i>' : idx;
+      return `<div class="step ${cls}"><div class="step-dot">${icon}</div><div class="step-label">${label}</div></div>`;
+    }).join('');
+
+    const pendingPago = s.estado === 'Pago pendiente' && s.procedencia === 'externa' && !s.comprobante;
+
+    return `
+    <div style="border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:12px">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:12px;gap:8px;flex-wrap:wrap">
+        <div>
+          <div style="font-size:14px;font-weight:700;color:var(--udep-navy)">${s.actividad}</div>
+          <div style="font-size:12px;color:var(--text-muted);margin-top:2px">${s.institucion} · ${s.id}</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+          ${badgeHTML(s.estado)}
+          <span style="font-size:12px;font-family:'DM Mono',monospace;color:var(--udep-navy);font-weight:600">${s.cl} CL</span>
+          <button class="btn btn-sm btn-ghost" onclick="openDetail('${s.id}')"><i data-lucide="eye"></i> Ver detalle</button>
+        </div>
+      </div>
+      ${pendingPago ? `
+      <div class="alert alert-amber" style="margin-bottom:10px">
+        <i data-lucide="upload-cloud"></i>
+        <div>
+          <strong>Pago pendiente</strong> — S/ 135.00. Realiza tu pago en el portal y luego sube tu captura para continuar.
+          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;align-items:center">
+            <button onclick="openPayModal()"
+               style="display:inline-flex;align-items:center;gap:5px;background:var(--udep-navy);color:#fff;padding:6px 12px;border-radius:7px;font-size:12px;font-weight:700;border:none;cursor:pointer">
+              <i data-lucide="credit-card" style="width:13px;height:13px"></i> Datos de pago
+            </button>
+            <button class="btn btn-sm" style="background:var(--amber);color:#fff;display:flex;align-items:center;gap:5px" onclick="subirComprobante('${s.id}')"><i data-lucide="upload-cloud" style="width:13px;height:13px"></i> Adjuntar comprobante</button>
+          </div>
+        </div>
+      </div>` : ''}
+      <div class="stepper">${stepHTML}</div>
+    </div>`;
+  }).join('');
+  lucide.createIcons();
+}
+
+/* ═══════════════════════════════════════════════════════════
+   ADMIN PANEL
+═══════════════════════════════════════════════════════════ */
+function renderAdmin() {
+  const todos     = solicitudes.length;
+  const pendientes= solicitudes.filter(s => s.estado === 'Pago pendiente' || s.estado === 'En Revisión').length;
+  const aprobados = solicitudes.filter(s => s.estado === 'Aprobado').length;
+  const rechazados= solicitudes.filter(s => s.estado === 'Rechazado').length;
+
+  document.getElementById('adminStats').innerHTML = `
+    <div class="stat-card"><div class="stat-label">Total Solicitudes</div><div class="stat-value">${todos}</div></div>
+    <div class="stat-card"><div class="stat-label">En Proceso</div><div class="stat-value" style="color:var(--amber)">${pendientes}</div></div>
+    <div class="stat-card"><div class="stat-label">Aprobadas</div><div class="stat-value" style="color:var(--green)">${aprobados}</div></div>
+    <div class="stat-card"><div class="stat-label">Rechazadas</div><div class="stat-value" style="color:var(--red)">${rechazados}</div></div>
+  `;
+
+  const estados = ['Todos','En Revisión','Pago pendiente','Aprobado','Rechazado'];
+  document.getElementById('adminFilters').innerHTML = estados.map(e =>
+    `<button class="filter-chip ${adminFilter===e?'active':''}" onclick="setAdminFilter('${e}')">${e}</button>`
+  ).join('');
+
+  renderAdminTable();
+  lucide.createIcons();
+}
+
+function setAdminFilter(f) {
+  adminFilter = f;
+  renderAdmin();
+}
+
+function filterAdmin(q) {
+  renderAdminTable(q);
+}
+
+function renderAdminTable(search = '') {
+  const q = search || document.getElementById('adminSearch')?.value || '';
+  const soloFuera = document.getElementById('filterFueraPlazos')?.checked;
+  let list = solicitudes;
+  if (adminFilter !== 'Todos') list = list.filter(s => s.estado === adminFilter);
+  if (soloFuera) list = list.filter(s => s.fueraPlazos);
+  if (q) list = list.filter(s =>
+    s.alumno.toLowerCase().includes(q.toLowerCase()) ||
+    s.actividad.toLowerCase().includes(q.toLowerCase())
+  );
+
+  const body = document.getElementById('adminTableBody');
+  if (!list.length) {
+    body.innerHTML = `<tr><td colspan="9" style="text-align:center;color:var(--text-muted);padding:30px">Sin resultados</td></tr>`;
+    return;
+  }
+  body.innerHTML = list.map(s => `
+    <tr>
+      <td><div style="font-weight:600">${s.alumno}</div><div style="font-size:11px;color:var(--text-muted)">${s.carrera}</div></td>
+      <td>
+        <div style="font-weight:600">${s.actividad}</div>
+        <div style="font-size:11px;color:var(--text-muted);display:flex;align-items:center;gap:6px;margin-top:2px">
+          ${s.institucion} · ${s.id}
+          ${s.fueraPlazos ? '<span class="out-of-date-badge">⏰ Fuera de plazo</span>' : ''}
+        </div>
+      </td>
+      <td style="font-size:12px">${tipoLabel(s.tipo)}</td>
+      <td>${s.modalidad === 'teorica'
+        ? '<span class="badge badge-green"><span class="dot"></span>Sí</span>'
+        : '<span class="badge badge-gray"><span class="dot"></span>No</span>'}</td>
+      <td>${s.horas}h</td>
+      <td><span style="font-family:'DM Mono',monospace;font-weight:600;color:var(--udep-navy)">${s.cl} CL</span></td>
+      <td>
+        ${s.procedencia === 'externa'
+          ? '<span class="badge badge-amber"><span class="dot"></span>Externa</span>'
+          : '<span class="badge badge-blue"><span class="dot"></span>Interna</span>'}
+      </td>
+      <td>${badgeHTML(s.estado)}</td>
+      <td>
+        <div class="action-group" style="flex-wrap:wrap">
+          <button class="btn btn-sm btn-ghost" onclick="openDetail('${s.id}')"><i data-lucide="eye"></i></button>
+          ${s.estado !== 'Aprobado' && s.estado !== 'Rechazado'
+            ? `<button class="btn btn-sm btn-green" onclick="askAction('${s.id}','Aprobado')"><i data-lucide="check"></i></button>
+               <button class="btn btn-sm btn-red" onclick="askAction('${s.id}','Rechazado')"><i data-lucide="x"></i></button>`
+            : ''}
+          ${s.fueraPlazos && s.estado !== 'Aprobado'
+            ? `<button class="btn btn-sm" style="background:#FFF7ED;color:#C2410C;border:1px solid #FDBA74" onclick="askAction('${s.id}','Aprobado',true)" title="Aprobar como excepción (fuera de plazo)"><i data-lucide="shield-check"></i></button>`
+            : ''}
+        </div>
+      </td>
+    </tr>
+  `).join('');
+  lucide.createIcons();
+}
+
+function askAction(id, newEstado, esExcepcion = false) {
+  const s = solicitudes.find(x => x.id === id);
+  if (!s) return;
+  // Show secondary modal for observation
+  showObservationModal(id, newEstado, esExcepcion);
+}
+
+function quickAction(id, newEstado, observacion = '', esExcepcion = false) {
+  const s = solicitudes.find(x => x.id === id);
+  if (!s) return;
+  const now = new Date();
+  const fecha = now.toLocaleDateString('es-PE', { day:'2-digit', month:'2-digit', year:'numeric' }) + ' ' +
+    now.toLocaleTimeString('es-PE', { hour:'2-digit', minute:'2-digit' });
+  s.estado = newEstado;
+  s.etapa  = newEstado === 'Aprobado' ? 5 : 1;
+  s.observacion = observacion || (newEstado === 'Aprobado' ? 'Aprobado por dirección.' : 'Rechazado por dirección.');
+  s.auditLog = s.auditLog || [];
+  s.auditLog.push({
+    tipo: newEstado === 'Aprobado' ? 'approved' : 'rejected',
+    accion: esExcepcion ? `Aprobado como excepción (fuera de plazo)` : newEstado,
+    usuario: 'Dr. Pedro Vega',
+    fecha,
+    detalle: s.observacion
+  });
+  // Push notification for alumno's own requests
+  if (s.alumno === currentUser.nombre) {
+    const msg = newEstado === 'Aprobado'
+      ? `Tu solicitud <strong>${s.id}</strong> (${s.actividad}) fue <strong>Aprobada</strong>.${esExcepcion ? ' (Excepción fuera de plazo)' : ''}`
+      : `Tu solicitud <strong>${s.id}</strong> (${s.actividad}) fue <strong>Rechazada</strong>. Motivo: ${s.observacion}`;
+    notifications.unshift({ id: 'n' + Date.now(), text: msg, time: 'Ahora', unread: true, solicitudId: s.id });
+    updateNotifBadge();
+  }
+  renderAdmin();
+  showToast(newEstado === 'Aprobado' ? `✓ ${s.id} aprobada` : `✗ ${s.id} rechazada`,
+    newEstado === 'Aprobado' ? 'success' : 'error');
+}
+
+/* ═══════════════════════════════════════════════════════════
+   OBSERVATION MODAL (RF-12)
+═══════════════════════════════════════════════════════════ */
+function showObservationModal(id, newEstado, esExcepcion) {
+  const s = solicitudes.find(x => x.id === id);
+  const isApprove = newEstado === 'Aprobado';
+  const color = isApprove ? 'var(--green)' : 'var(--udep-red)';
+  const icon = isApprove ? 'check-circle' : 'x-circle';
+  const label = esExcepcion ? 'Aprobar como excepción (fuera de plazo)' : (isApprove ? 'Aprobar' : 'Rechazar');
+
+  document.getElementById('modalTitle').textContent = label + ': ' + s.actividad;
+  document.getElementById('modalBody').innerHTML = `
+    <div class="alert ${isApprove ? 'alert-green' : 'alert-red'}" style="margin-bottom:16px">
+      <i data-lucide="${icon}"></i>
+      <div>Estás a punto de <strong>${label.toLowerCase()}</strong> esta solicitud. Por favor registra un comentario antes de confirmar.</div>
+    </div>
+    ${esExcepcion ? `<div class="alert alert-amber" style="margin-bottom:16px"><i data-lucide="alert-triangle"></i><div><strong>Excepción fuera de plazo:</strong> Esta aprobación se registrará en el historial como una excepción manual.</div></div>` : ''}
+    <div class="form-group">
+      <label class="form-label">${isApprove ? 'Comentario / Observación' : 'Motivo del rechazo'} <span style="color:var(--udep-red)">*</span></label>
+      <textarea class="form-input" id="obsTexto" rows="3" placeholder="${isApprove ? 'Ej. Documentación completa y válida.' : 'Ej. Horas insuficientes, certificado ilegible...'}" style="resize:vertical"></textarea>
+      <span class="form-error hidden" id="obsError">Este campo es obligatorio.</span>
+    </div>
+  `;
+  document.getElementById('modalActions').innerHTML = `
+    <button class="btn btn-ghost" onclick="closeModal()">Cancelar</button>
+    <button class="btn" style="background:${color};color:#fff" onclick="confirmAction('${id}','${newEstado}',${esExcepcion})">
+      <i data-lucide="${icon}"></i> Confirmar ${label}
+    </button>
+  `;
+  document.getElementById('detailModal').classList.add('open');
+  lucide.createIcons();
+}
+
+function confirmAction(id, newEstado, esExcepcion) {
+  const obs = document.getElementById('obsTexto').value.trim();
+  if (!obs) {
+    document.getElementById('obsError').classList.remove('hidden');
+    return;
+  }
+  closeModal();
+  quickAction(id, newEstado, obs, esExcepcion);
+}
+
+/* ═══════════════════════════════════════════════════════════
+   NOTIFICATIONS (RF-09)
+═══════════════════════════════════════════════════════════ */
+function updateNotifBadge() {
+  const count = notifications.filter(n => n.unread).length;
+  const badge = document.getElementById('notifBadge');
+  if (count > 0) {
+    badge.textContent = count > 9 ? '9+' : count;
+    badge.classList.remove('hidden');
+  } else {
+    badge.classList.add('hidden');
+  }
+  renderNotifList();
+}
+
+function renderNotifList() {
+  const list = document.getElementById('notifList');
+  if (!list) return;
+  if (!notifications.length) {
+    list.innerHTML = `<div style="padding:20px;text-align:center;color:var(--text-muted);font-size:13px">Sin notificaciones</div>`;
+    return;
+  }
+  list.innerHTML = notifications.map(n => `
+    <div class="notif-item ${n.unread ? 'unread' : ''}" onclick="readNotif('${n.id}')">
+      <div class="notif-dot ${n.unread ? '' : 'read'}"></div>
+      <div style="flex:1">
+        <div class="notif-text">${n.text}</div>
+        <div class="notif-time">${n.time}</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function readNotif(id) {
+  const n = notifications.find(x => x.id === id);
+  if (n) { n.unread = false; updateNotifBadge(); }
+}
+
+function markAllRead() {
+  notifications.forEach(n => n.unread = false);
+  updateNotifBadge();
+}
+
+function toggleNotifPanel() {
+  const panel = document.getElementById('notifPanel');
+  const wrap = document.getElementById('notifWrap');
+  panel.classList.toggle('open');
+  renderNotifList();
+  // Hide notif panel if admin view
+  if (currentRole === 'admin') { panel.classList.remove('open'); return; }
+}
+
+// Close notif panel when clicking outside
+document.addEventListener('click', e => {
+  const wrap = document.getElementById('notifWrap');
+  if (wrap && !wrap.contains(e.target)) {
+    document.getElementById('notifPanel')?.classList.remove('open');
+  }
+});
+
+function openDetail(id) {
+  const s = solicitudes.find(x => x.id === id);
+  if (!s) return;
+  const isAdmin = currentRole === 'admin';
+  document.getElementById('modalTitle').textContent = s.actividad;
+
+  // Build audit log HTML
+  const auditIcons = { created:'plus-circle', approved:'check-circle', rejected:'x-circle', pending:'clock', chat:'message-circle', payment:'credit-card' };
+  const auditHTML = (s.auditLog || []).map(e => `
+    <div class="audit-entry">
+      <div class="audit-icon ${e.tipo}"><i data-lucide="${auditIcons[e.tipo]||'circle'}" style="width:14px;height:14px"></i></div>
+      <div class="audit-body">
+        <div class="audit-action">${e.accion} <span class="audit-by">· ${e.usuario}</span></div>
+        <div class="audit-detail">${e.fecha}${e.detalle ? ' — ' + e.detalle : ''}</div>
+      </div>
+    </div>`).join('');
+
+  // Build chat HTML
+  const chatMessages = (s.chat || []).map(m => `
+    <div class="chat-msg from-${m.de}">
+      <div class="chat-bubble">${m.texto}</div>
+      <div class="chat-meta">${m.nombre} · ${m.hora}</div>
+    </div>`).join('');
+
+  // Comprobante section
+  let comprobanteHTML = '';
+  if (s.procedencia === 'externa') {
+    if (s.comprobante) {
+      comprobanteHTML = `
+        <div style="margin-bottom:16px">
+          <div style="font-size:12px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">Comprobante de Pago</div>
+          <div style="display:flex;align-items:center;gap:8px;padding:10px;background:var(--green-bg);border-radius:8px">
+            <i data-lucide="file-check" style="color:var(--green);width:16px;height:16px"></i>
+            <span style="font-size:13px;color:var(--green);font-weight:600">${s.comprobante}</span>
+            ${isAdmin ? `<span class="badge badge-green" style="margin-left:auto"><span class="dot"></span>Validado</span>` : ''}
+          </div>
+          ${isAdmin && s.estado === 'Pago pendiente' ? `
+          <div style="margin-top:8px;display:flex;gap:8px">
+            <button class="btn btn-sm btn-green" onclick="validarComprobante('${s.id}')"><i data-lucide="check"></i> Validar y cerrar proceso</button>
+          </div>` : ''}
+        </div>`;
+    } else if (!isAdmin) {
+      // Alumno puede subir comprobante si está Pago pendiente
+      if (s.estado === 'Pago pendiente') {
+        comprobanteHTML = `
+          <div style="margin-bottom:16px">
+            <div style="font-size:12px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">Comprobante de Pago</div>
+            <div class="upload-zone" onclick="subirComprobante('${s.id}')" style="padding:16px">
+              <div style="display:flex;justify-content:center;margin-bottom:6px"><i data-lucide="upload-cloud" style="width:28px;height:28px;color:var(--text-muted)"></i></div>
+              <p><strong>Haz clic para adjuntar</strong> tu captura o voucher de pago</p>
+              <p style="font-size:11px;margin-top:4px">PDF, JPG o PNG · máx. 5 MB</p>
+            </div>
+          </div>`;
+      }
+    } else {
+      // Admin ve que no hay comprobante aún
+      comprobanteHTML = `
+        <div style="margin-bottom:16px">
+          <div style="font-size:12px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">Comprobante de Pago</div>
+          <div style="padding:10px;background:var(--red-bg);border-radius:8px;font-size:13px;color:var(--red);display:flex;align-items:center;gap:8px">
+            <i data-lucide="clock" style="width:16px;height:16px"></i> El alumno aún no ha subido el comprobante.
+          </div>
+        </div>`;
+    }
+  }
+
+  document.getElementById('modalBody').innerHTML = `
+    <div class="grid2" style="margin-bottom:14px;gap:12px">
+      <div><span style="font-size:11px;font-weight:600;color:var(--text-muted)">ALUMNO</span><div style="font-weight:700;margin-top:2px">${s.alumno}</div></div>
+      <div><span style="font-size:11px;font-weight:600;color:var(--text-muted)">CARRERA</span><div style="font-weight:700;margin-top:2px">${s.carrera}</div></div>
+      <div><span style="font-size:11px;font-weight:600;color:var(--text-muted)">INSTITUCIÓN ORGANIZADORA</span><div style="font-weight:700;margin-top:2px">${s.institucion}</div></div>
+      <div><span style="font-size:11px;font-weight:600;color:var(--text-muted)">PROCEDENCIA</span><div style="font-weight:700;margin-top:2px">${s.procedencia === 'externa' ? 'Externa' : 'Interna (UDEP)'}</div></div>
+      <div style="grid-column:1/-1"><span style="font-size:11px;font-weight:600;color:var(--text-muted)">TIPO DE ACTIVIDAD</span><div style="font-weight:700;margin-top:2px">${tipoLabel(s.tipo)}</div></div>
+      <div><span style="font-size:11px;font-weight:600;color:var(--text-muted)">¿EVALUADO CON NOTA?</span><div style="font-weight:700;margin-top:4px">${s.modalidad === 'teorica' ? badgeHTML('Sí') : badgeHTML('No')}</div></div>
+      <div><span style="font-size:11px;font-weight:600;color:var(--text-muted)">HORAS CERTIFICADAS</span><div style="font-weight:700;margin-top:2px">${s.horas}h → <strong>${s.cl} CL</strong></div></div>
+    </div>
+
+    ${s.fueraPlazos ? `<div class="alert alert-amber" style="margin-bottom:14px"><i data-lucide="alert-triangle"></i><div><strong>⏰ Solicitud fuera de plazo ordinario.</strong> Requiere aprobación manual como excepción.</div></div>` : ''}
+    ${s.observacion ? `<div style="margin-bottom:12px;padding:10px;background:var(--bg);border-radius:8px;border-left:3px solid var(--udep-blue)"><span style="font-size:11px;font-weight:600;color:var(--text-muted)">OBSERVACIÓN DEL DIRECTOR</span><div style="font-size:13px;color:var(--text);margin-top:4px">${s.observacion}</div></div>` : ''}
+
+    <!-- Certificado -->
+    <div style="margin-bottom:12px">
+      <div style="font-size:12px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">Certificado / Constancia</div>
+      <div style="display:flex;align-items:center;gap:8px;padding:8px;background:var(--green-bg);border-radius:8px">
+        <i data-lucide="file-check" style="color:var(--green);width:16px;height:16px"></i>
+        <span style="font-size:13px;color:var(--green);font-weight:600">${s.archivo}</span>
+      </div>
+    </div>
+
+    <!-- Comprobante (RF-15, RF-16) -->
+    ${comprobanteHTML}
+
+    <!-- Estado actual -->
+    <div style="margin-bottom:16px;display:flex;align-items:center;gap:8px">${badgeHTML(s.estado)}</div>
+
+    <!-- Chat (RF-22) -->
+    <div style="margin-bottom:16px">
+      <div style="font-size:12px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">💬 Comunicación</div>
+      <div class="chat-thread" id="chatThread">
+        ${chatMessages || '<div style="color:var(--text-muted);font-size:12px;text-align:center">Sin mensajes aún.</div>'}
+      </div>
+      <div class="chat-input-row">
+        <input type="text" class="form-input" id="chatInput" placeholder="Escribe un mensaje..." style="font-size:13px" onkeydown="if(event.key==='Enter')sendChat('${s.id}')"/>
+        <button class="btn btn-primary btn-sm" onclick="sendChat('${s.id}')"><i data-lucide="send"></i></button>
+      </div>
+    </div>
+
+    <!-- Audit log (RF-24) -->
+    <div>
+      <div style="font-size:12px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">📋 Historial de Trazabilidad</div>
+      <div class="audit-log">${auditHTML || '<div style="color:var(--text-muted);font-size:12px">Sin historial.</div>'}</div>
+    </div>
+  `;
+
+  document.getElementById('modalActions').innerHTML = isAdmin && s.estado !== 'Aprobado' && s.estado !== 'Rechazado'
+    ? `<button class="btn btn-ghost" onclick="closeModal()">Cerrar</button>
+       <button class="btn btn-green" onclick="closeModal();askAction('${id}','Aprobado',${s.fueraPlazos})"><i data-lucide="check"></i> ${s.fueraPlazos ? 'Aprobar (Excepción)' : 'Aprobar'}</button>
+       <button class="btn btn-red" onclick="closeModal();askAction('${id}','Rechazado')"><i data-lucide="x"></i> Rechazar</button>`
+    : `<button class="btn btn-ghost" onclick="closeModal()">Cerrar</button>`;
+
+  document.getElementById('detailModal').classList.add('open');
+  lucide.createIcons();
+  // Scroll chat to bottom
+  const ct = document.getElementById('chatThread');
+  if (ct) ct.scrollTop = ct.scrollHeight;
+}
+
+function subirComprobante(id) {
+  const s = solicitudes.find(x => x.id === id);
+  if (!s) return;
+
+  // 1. Creamos un selector de archivos invisible
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = '.pdf, image/jpeg, image/png'; // Acepta PDF, JPG y PNG
+
+  // 2. Le decimos qué hacer cuando el usuario elija un archivo
+  input.onchange = function(e) {
+    const file = e.target.files[0];
+    if (!file) return; // Si el usuario cierra la ventana sin elegir nada, cancelamos
+
+    // 3. Guardamos el nombre real del archivo seleccionado
+    s.comprobante = file.name;
+
+    // 4. Ejecutamos la lógica que ya tenías para registrar el pago
+    const now = new Date();
+    const fecha = now.toLocaleDateString('es-PE', { day:'2-digit', month:'2-digit', year:'numeric' }) + ' ' +
+      now.toLocaleTimeString('es-PE', { hour:'2-digit', minute:'2-digit' });
+      
+    s.auditLog = s.auditLog || [];
+    s.auditLog.push({ 
+      tipo: 'payment', 
+      accion: 'Comprobante de pago subido', 
+      usuario: currentUser.nombre, 
+      fecha, 
+      detalle: s.comprobante 
+    });
+    
+    showToast('✓ Comprobante subido correctamente', 'success');
+    
+    // 5. Actualizamos la pantalla y el modal
+    renderDashboard();
+    openDetail(id);
+  };
+
+  // 6. Hacemos "clic" en el selector invisible para abrir la ventana de Windows/Mac
+  input.click();
+}
+
+function validarComprobante(id) {
+  const s = solicitudes.find(x => x.id === id);
+  if (!s) return;
+  s.estado = 'Aprobado'; s.etapa = 5;
+  const now = new Date();
+  const fecha = now.toLocaleDateString('es-PE', { day:'2-digit', month:'2-digit', year:'numeric' }) + ' ' +
+    now.toLocaleTimeString('es-PE', { hour:'2-digit', minute:'2-digit' });
+  s.auditLog.push({ tipo: 'approved', accion: 'Comprobante validado y proceso cerrado', usuario: 'Dr. Pedro Vega', fecha, detalle: 'Pago verificado. Registro final en SIGA.' });
+  if (s.alumno === currentUser.nombre) {
+    notifications.unshift({ id: 'n' + Date.now(), text: `Tu solicitud <strong>${s.id}</strong> fue cerrada exitosamente. Créditos registrados en SIGA.`, time: 'Ahora', unread: true });
+    updateNotifBadge();
+  }
+  closeModal();
+  renderAdmin();
+  showToast('✓ Proceso cerrado. Créditos registrados.', 'success');
+}
+
+/* ═══════════════════════════════════════════════════════════
+   CHAT (RF-22)
+═══════════════════════════════════════════════════════════ */
+function sendChat(id) {
+  const s = solicitudes.find(x => x.id === id);
+  const input = document.getElementById('chatInput');
+  const texto = input?.value.trim();
+  if (!texto || !s) return;
+  const now = new Date();
+  const hora = now.toLocaleDateString('es-PE', { day:'2-digit', month:'2-digit' }) + ' ' +
+    now.toLocaleTimeString('es-PE', { hour:'2-digit', minute:'2-digit' });
+  const isAdmin = currentRole === 'admin';
+  s.chat = s.chat || [];
+  s.chat.push({ de: isAdmin ? 'admin' : 'alumno', nombre: isAdmin ? 'Dr. Pedro Vega' : currentUser.nombre, texto, hora });
+  s.auditLog = s.auditLog || [];
+  s.auditLog.push({ tipo: 'chat', accion: 'Mensaje enviado', usuario: isAdmin ? 'Dr. Pedro Vega' : currentUser.nombre, fecha: hora, detalle: texto.substring(0, 60) + (texto.length > 60 ? '...' : '') });
+  input.value = '';
+  // Push notif to other party
+  if (!isAdmin && s.alumno === currentUser.nombre) {
+    // Alumno notifies admin — no panel for admin, but we can log
+  } else if (isAdmin) {
+    notifications.unshift({ id: 'n' + Date.now(), text: `Nuevo mensaje del área administrativa en solicitud <strong>${s.id}</strong>: "${texto.substring(0,50)}"`, time: 'Ahora', unread: true, solicitudId: s.id });
+    updateNotifBadge();
+  }
+  // Re-render chat
+  const thread = document.getElementById('chatThread');
+  if (thread) {
+    thread.innerHTML = s.chat.map(m => `
+      <div class="chat-msg from-${m.de}">
+        <div class="chat-bubble">${m.texto}</div>
+        <div class="chat-meta">${m.nombre} · ${m.hora}</div>
+      </div>`).join('');
+    thread.scrollTop = thread.scrollHeight;
+  }
+}
+
+function closeModal() {
+  document.getElementById('detailModal').classList.remove('open');
+}
+
+/* ═══════════════════════════════════════════════════════════
+   FORM LOGIC
+═══════════════════════════════════════════════════════════ */
+function resetForm() {
+  ['fNombre','fInstitucion'].forEach(id => { document.getElementById(id).value = ''; });
+  document.getElementById('fHoras').value = '';
+  document.getElementById('fProcedencia').value = 'interna';
+  document.getElementById('fTipo').value = 'intercambio';
+  document.getElementById('fModalidad').value = 'teorica';
+  document.getElementById('fCLElegido').value = '';
+  document.getElementById('alertaPago').classList.add('hidden');
+  document.getElementById('fileUploaded').classList.add('hidden');
+  document.getElementById('uploadZone').classList.remove('hidden');
+  document.getElementById('btnEnviar').disabled = true;
+  fileAttached = false;
+}
+
+// Mostrar alerta pago si es externa
+function checkPago() {
+  const externa = document.getElementById('fProcedencia').value === 'externa';
+  document.getElementById('alertaPago').classList.toggle('hidden', !externa);
+  lucide.createIcons();
+}
+
+// Cálculo en tiempo real de créditos (muestra alerta en hintHoras)
+function calcHorasLive() {
+  const horas = parseInt(document.getElementById('fHoras').value) || 0;
+  const modalidad = document.getElementById('fModalidad').value;
+  const cl = calcCreditos(horas, modalidad);
+  const tope = currentUser.topeCreditos;
+  const acum = getMisCL();
+  const proyectado = acum + cl;
+
+  const hintEl = document.getElementById('hintHoras');
+  if (horas > 0) {
+    if (proyectado > tope) {
+      hintEl.style.color = 'var(--udep-red)';
+      hintEl.textContent = `⚠ Supera el tope de ${tope} CL para ${currentUser.carrera}. Se computarán ${Math.max(0,tope-acum)} CL adicionales.`;
+    } else if (cl === 0) {
+      hintEl.style.color = 'var(--amber)';
+      hintEl.textContent = `Horas insuficientes. Necesitas ${modalidad==='practica'?32:16}h para 1 CL.`;
+    } else {
+      hintEl.style.color = 'var(--green)';
+      hintEl.textContent = `✓ ${cl} CL equivalentes · Total proyectado: ${Math.min(proyectado,tope)} / ${tope} CL`;
+    }
+  } else {
+    hintEl.style.color = '';
+    hintEl.textContent = modalidad === 'practica' ? '32h (sin nota) = 1 CL' : '16h (evaluado con nota) = 1 CL';
+  }
+}
+
+// Validación general del formulario
+function validateForm() {
+  const nombre = document.getElementById('fNombre').value.trim();
+  const horas  = parseInt(document.getElementById('fHoras').value) || 0;
+  const errNombre = document.getElementById('errNombre');
+  const nombreInput = document.getElementById('fNombre');
+
+  // RF-05: Duplicado
+  const duplicado = nombre.length > 0 && solicitudes.find(s =>
+    s.alumno === currentUser.nombre && s.estado === 'Aprobado' &&
+    s.actividad.toLowerCase() === nombre.toLowerCase()
+  );
+  if (duplicado) {
+    errNombre.textContent = `⚠ Ya tienes esta actividad aprobada (${duplicado.id}). No puedes registrarla dos veces.`;
+    errNombre.style.color = 'var(--amber)';
+    errNombre.classList.remove('hidden');
+    nombreInput.classList.add('error');
+  } else {
+    errNombre.textContent = 'Campo requerido';
+    errNombre.style.color = '';
+    errNombre.classList.toggle('hidden', nombre.length > 0);
+    nombreInput.classList.toggle('error', nombre.length === 0);
+  }
+
+  const valid = nombre.length > 0 && horas >= 1 && !duplicado;
+  const clElegido = document.getElementById('fCLElegido').value;
+  document.getElementById('errCL').classList.toggle('hidden', clElegido.length > 0);
+  document.getElementById('btnEnviar').disabled = !(nombre.length > 0 && horas >= 1 && !duplicado && clElegido.length > 0);
+  document.getElementById('errHoras').classList.toggle('hidden', horas >= 1);
+  calcHorasLive();
+}
+
+// Simulación de envío
+function submitForm() {
+  const horas    = parseInt(document.getElementById('fHoras').value) || 0;
+  const modalidad= document.getElementById('fModalidad').value;
+  const cl       = calcCreditos(horas, modalidad);
+  const acum     = getMisCL();
+  const tope     = currentUser.topeCreditos;
+  const nombre   = document.getElementById('fNombre').value.trim();
+
+  // RF-05: Validación de duplicados
+  const yaAprobado = solicitudes.find(s =>
+    s.alumno === currentUser.nombre &&
+    s.estado === 'Aprobado' &&
+    s.actividad.toLowerCase() === nombre.toLowerCase()
+  );
+  if (yaAprobado) {
+    showToast('⚠ Ya tienes una solicitud aprobada con ese nombre de actividad.', 'error');
+    const errEl = document.getElementById('errNombre');
+    errEl.textContent = '⚠ Ya tienes esta actividad aprobada (' + yaAprobado.id + '). No puedes registrarla dos veces.';
+    errEl.classList.remove('hidden');
+    errEl.style.color = 'var(--amber)';
+    document.getElementById('fNombre').classList.add('error');
+    return;
+  }
+
+  const now = new Date();
+  const fecha = now.toLocaleDateString('es-PE', { day:'2-digit', month:'2-digit', year:'numeric' }) + ' ' +
+    now.toLocaleTimeString('es-PE', { hour:'2-digit', minute:'2-digit' });
+
+  const nuevaSolicitud = {
+    id: 'CLC-2024-00' + (solicitudes.length + 1),
+    alumno: currentUser.nombre, carrera: currentUser.carrera,
+    actividad: nombre,
+    clElegido: document.getElementById('fCLElegido').value,
+    institucion: document.getElementById('fInstitucion').value.trim() || 'Sin especificar',
+    tipo:        document.getElementById('fTipo').value,
+    modalidad,
+    horas,
+    cl:          Math.min(cl, Math.max(0, tope - acum)),
+    procedencia: document.getElementById('fProcedencia').value,
+    fechaInicio: '', fechaFin: '',
+    estado:      'En Revisión',
+    etapa:       1,
+    descripcion: '',
+    archivo:     fileAttached ? (document.querySelector('.uploaded-filename')?.textContent || buildFilename('certificado.pdf')) : 'sin_adjunto.pdf',
+    comprobante: null,
+    fueraPlazos: false,
+    observacion: '',
+    auditLog: [{ tipo: 'created', accion: 'Solicitud registrada', usuario: currentUser.nombre, fecha, detalle: 'Nueva solicitud enviada' }],
+    chat: []
+  };
+
+  solicitudes.push(nuevaSolicitud);
+  // Notificación automática al alumno
+  notifications.unshift({ id: 'n' + Date.now(), text: `Tu solicitud <strong>${nuevaSolicitud.id}</strong> (${nombre}) fue enviada y está <strong>En Revisión</strong>.`, time: 'Ahora', unread: true, solicitudId: nuevaSolicitud.id });
+  updateNotifBadge();
+  showToast('✓ Solicitud enviada correctamente', 'success');
+  navigate('dashboard');
+}
+
+// Real file upload with auto-formatted filename
+let uploadedFile = null;
+
+function openFilePicker() {
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = '.pdf,application/pdf';
+  input.onchange = function(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    if (!file.name.toLowerCase().endsWith('.pdf') && file.type !== 'application/pdf') {
+      showToast('⚠ Solo se admiten archivos PDF', 'error');
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      showToast('⚠ El archivo supera el límite de 5 MB', 'error');
+      return;
+    }
+    uploadedFile = file;
+    // Auto-format: SIGLAS - APELLIDOS_NOMBRES_NOMBREDELCURSO
+    const formattedName = buildFilename(file.name);
+    fileAttached = true;
+    document.getElementById('uploadZone').classList.add('hidden');
+    const uploadedDiv = document.getElementById('fileUploaded');
+    uploadedDiv.classList.remove('hidden');
+    uploadedDiv.style.display = 'flex';
+    uploadedDiv.querySelector('.uploaded-filename').textContent = formattedName;
+    lucide.createIcons();
+    validateForm();
+  };
+  input.click();
+}
+
+function buildFilename(originalName) {
+  // Determine academic program abbreviation from career
+  const siglaMap = {
+    'Ingeniería': 'ISS',
+    'Arquitectura': 'ARQ',
+  };
+  const siglas = siglaMap[currentUser.carrera] || 'ISS';
+  // Build last name + first name from currentUser.nombre
+  // Format: "Eduardo Joao Sánchez Farías" → "SANCHEZ FARIAS EDUARDO JOAO"
+  const parts = currentUser.nombre.trim().split(/\s+/);
+  // Heuristic: last 2 tokens are last names, rest are first names
+  let firstNames, lastNames;
+  if (parts.length >= 3) {
+    lastNames = parts.slice(-2).join(' ');
+    firstNames = parts.slice(0, -2).join(' ');
+  } else if (parts.length === 2) {
+    lastNames = parts[1];
+    firstNames = parts[0];
+  } else {
+    lastNames = parts[0];
+    firstNames = '';
+  }
+  // Course name from form
+  const courseName = document.getElementById('fNombre').value.trim().toUpperCase() ||
+    originalName.replace(/\.pdf$/i,'').toUpperCase();
+  const fullName = (lastNames + ' ' + firstNames).trim().toUpperCase()
+    .normalize('NFD').replace(/[\u0300-\u036f]/g,''); // remove accents
+  const courseNorm = courseName.normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+  return `${siglas} - ${fullName}_${courseNorm}.pdf`;
+}
+
+function simulateUpload() {
+  openFilePicker();
+}
+
+function removeFile() {
+  fileAttached = false;
+  uploadedFile = null;
+  document.getElementById('uploadZone').classList.remove('hidden');
+  document.getElementById('fileUploaded').classList.add('hidden');
+  validateForm();
+}
+
+/* ═══════════════════════════════════════════════════════════
+   CALCULADORA (Dashboard widget)
+═══════════════════════════════════════════════════════════ */
+function recalc() {
+  const horas    = parseInt(document.getElementById('calcHoras').value) || 0;
+  const tipo     = document.getElementById('calcType').value;
+  const clReal   = calcCreditosReal(horas, tipo);
+  const cl       = Math.floor(clReal);
+  const acum     = getMisCL();
+  const proyect  = acum + cl;
+  const tope     = currentUser.topeCreditos;
+
+  const divisor  = tipo === 'practica' ? 32 : 16;
+  const realLabel = horas > 0 ? ` <span style="font-size:11px;color:var(--text-muted);font-weight:400">(valor real: ${clReal.toFixed(4)} CL)</span>` : '';
+  document.getElementById('calcResult').innerHTML = `<span>${cl} CL</span>${realLabel}`;
+  document.getElementById('calcAccum').textContent  = acum.toFixed(2) + ' CL';
+  const totalEl = document.getElementById('calcTotal');
+  const capped  = Math.min(proyect, tope);
+  totalEl.textContent = capped.toFixed(2) + ' CL';
+  totalEl.style.color = capped >= tope ? 'var(--green)' : 'var(--udep-red)';
+
+  const alertEl = document.getElementById('calcAlert');
+  if (proyect > tope) {
+    alertEl.innerHTML = `<div class="alert alert-amber" style="margin:0"><i data-lucide="alert-triangle"></i><span>Se superaría el tope de ${tope} CL para ${currentUser.carrera}. Solo se registrarán ${Math.max(0,tope-acum)} CL adicionales.</span></div>`;
+  } else if (cl === 0 && horas > 0) {
+    alertEl.innerHTML = `<div class="alert alert-red" style="margin:0"><i data-lucide="x-circle"></i><span>Horas insuficientes para un crédito. Necesitas ${divisor}h mínimo para esta modalidad. Valor actual: ${clReal.toFixed(4)} CL.</span></div>`;
+  } else {
+    alertEl.innerHTML = '';
+  }
+  lucide.createIcons();
+}
+
+/* ═══════════════════════════════════════════════════════════
+   HELPERS
+═══════════════════════════════════════════════════════════ */
+function tipoLabel(tipo) {
+  const map = {
+    'intercambio':       'Curso de intercambio estudiantil',
+    'extension':         'Actividades y cursos de extensión (Fac. Ingeniería)',
+    'vida_universitaria':'Actividades de Vida Universitaria',
+    'externos':          'Actividades externas a la facultad de Ingeniería',
+    'congreso':          'Congresos',
+    // legacy fallbacks
+    'curso':             'Curso / Taller',
+    'voluntariado':      'Voluntariado',
+    'arte':              'Arte / Cultura',
+  };
+  return map[tipo] || capitalize(tipo);
+}
+
+function badgeHTML(estado) {
+  const map = {
+    'Aprobado':          'badge-green',
+    'En Revisión':       'badge-blue',
+    'Pago pendiente': 'badge-amber',
+    'Rechazado':         'badge-red',
+    'Sí':                'badge-green',
+    'No':                'badge-gray',
+  };
+  
+  // Identificamos si es un estado principal
+  const esEstadoPrincipal = ['Aprobado', 'En Revisión', 'Pago pendiente', 'Rechazado'].includes(estado);
+  
+  // Cambiamos "flex-start" por "center" para que todo quede en el medio
+  const widthStyle = esEstadoPrincipal ? 'style="width: 135px; justify-content: center;"' : '';
+
+  return `<span class="badge ${map[estado] || 'badge-gray'}" ${widthStyle}><span class="dot"></span>${estado}</span>`;
+}
+
+function capitalize(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
+
+function showToast(msg, type = '') {
+  const container = document.getElementById('toast-container');
+  const toast = document.createElement('div');
+  toast.className = `toast ${type}`;
+  toast.innerHTML = `<i data-lucide="${type==='success'?'check-circle':type==='error'?'x-circle':'info'}" style="width:16px;height:16px"></i> ${msg}`;
+  container.appendChild(toast);
+  lucide.createIcons();
+  setTimeout(() => toast.remove(), 3500);
+}
+
+/* ═══════════════════════════════════════════════════════════
+   PAYMENT BANK MODAL
+═══════════════════════════════════════════════════════════ */
+function openPayModal() {
+  const overlay = document.getElementById('payBankModal');
+  overlay.classList.add('open');
+  lucide.createIcons();
+}
+function closePayModal() {
+  document.getElementById('payBankModal').classList.remove('open');
+}
+
+// Close modal on overlay click
+document.getElementById('detailModal').addEventListener('click', e => {
+  if (e.target === e.currentTarget) closeModal();
+});
+
+/* ═══════════════════════════════════════════════════════════
+   INIT
+═══════════════════════════════════════════════════════════ */
+window.onload = function() {
+  buildSidebar();
+  updateNotifBadge();
+  navigate('dashboard');
+};
+
+</script>
+</body>
+</html>
