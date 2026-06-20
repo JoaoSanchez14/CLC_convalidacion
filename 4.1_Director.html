@@ -112,7 +112,7 @@ input, select, textarea { font-family: inherit; }
 .card { background: var(--surface); border-radius: var(--radius); box-shadow: var(--shadow); border: 1px solid var(--border); padding: 22px; margin-bottom: 20px; }
 
 .grid5 { display: grid; grid-template-columns: repeat(5, 1fr); gap: 20px; margin-bottom: 24px; }
-.grid6 { display: grid; grid-template-columns: repeat(6, 1fr); gap: 16px; margin-bottom: 24px; }
+.grid6 { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 16px; margin-bottom: 24px; }
 .stat-card { background: var(--surface); border-radius: var(--radius); border: 1px solid var(--border); padding: 20px; display: flex; flex-direction: column; gap: 8px; box-shadow: var(--shadow); }
 .stat-label { font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: .5px; }
 .stat-value { font-size: 32px; font-weight: 800; color: var(--udep-navy); line-height: 1; }
@@ -212,7 +212,7 @@ textarea.form-input { resize: vertical; min-height: 80px; width: 100%; }
         <div class="user-avatar">AG</div>
         <div class="user-info">
           <div class="user-name">Angela Flores</div>
-          <div class="user-role">Director</div>
+          <div class="user-role">Director IIS</div>
         </div>
       </div>
       <button onclick="cerrarSesion()" title="Cerrar sesión"
@@ -242,21 +242,14 @@ textarea.form-input { resize: vertical; min-height: 80px; width: 100%; }
       <div class="card">
         <div class="filter-bar">
           <div style="display: flex; gap: 12px; flex-wrap: wrap; align-items: center;">
-            <select class="form-input" id="filterPrograma" onchange="renderTable()" style="width: auto; min-width: 150px; cursor: pointer;">
-              <option value="Todos">Todos los Programas</option>
-              <option value="Ingeniería Mecánico Eléctrico">Ingeniería Mecánico Eléctrico</option>
-              <option value="Arquitectura">Arquitectura</option>
-              <option value="Ingeniería Civil">Ingeniería Civil</option>
-              <option value="Ingeniería Industrial y de Sistemas">Ingeniería Industrial y de Sistemas</option>
-              <option value="Ingeniería de Software e Inteligencia Artificial">Ing. de Software e IA</option>
-            </select>
-            <select class="form-input" id="filterEstado" onchange="renderTable()" style="width: auto; min-width: 150px; cursor: pointer;">
+            <select class="form-input" id="filterEstado" onchange="renderTable()" style="width: auto; min-width: 180px; cursor: pointer;">
               <option value="Todos">Todos los Estados</option>
-              <option value="formato">Documentos por Validar</option>
-              <option value="pago_revision">Espera de Pago</option>
-              <option value="subsanacion">Esperando Subsanación</option>
+              <option value="revision">En Revisión</option>
+              <option value="observada">Observada</option>
+              <option value="aprobado">Aprobado</option>
               <option value="rechazado">Rechazado</option>
-              <option value="direccion">Aprobado</option>
+              <option value="pago_pendiente">Pendiente de Pago</option>
+              <option value="siga">Finalizado</option>
             </select>
           </div>
           <div>
@@ -270,7 +263,14 @@ textarea.form-input { resize: vertical; min-height: 80px; width: 100%; }
                 <th>Cod. Solicitud</th>
                 <th>Alumno / Programa</th>
                 <th>Actividad</th>
-                <th>Estado</th>
+                <th>
+                  <div style="display:flex;align-items:center;gap:6px;">
+                    Estado
+                    <button id="btnSortEstado" onclick="toggleSortEstado()" title="Ordenar por estado" style="background:none;border:1px solid var(--border);border-radius:5px;padding:2px 6px;cursor:pointer;color:var(--text-muted);font-size:11px;display:inline-flex;align-items:center;gap:3px;">
+                      <i data-lucide="arrow-up-down" style="width:12px;height:12px;"></i>
+                    </button>
+                  </div>
+                </th>
                 <th>Acciones</th>
               </tr>
             </thead>
@@ -305,31 +305,6 @@ textarea.form-input { resize: vertical; min-height: 80px; width: 100%; }
           </div>
         </div>
       </div>
-    </div>
-  </div>
-</div>
-
-<div class="modal-overlay" id="modalPago">
-  <div class="modal">
-    <div class="modal-header">
-      <span class="modal-title">Verificar Váucher de Pago</span>
-      <button class="modal-close" onclick="closeModal('modalPago')"><i data-lucide="x"></i></button>
-    </div>
-    <div class="alert alert-amber"><i data-lucide="credit-card"></i> Esta actividad es externa. El alumno ha subido su comprobante de pago por S/ 135.00.</div>
-    
-    <div class="doc-preview">
-      <div class="doc-icon" style="color: var(--amber);"><i data-lucide="receipt"></i></div>
-      <div class="doc-info">
-        <div class="doc-name">vaucher_pago_caja.pdf</div>
-        <div class="doc-meta" id="pagAlumno"></div>
-      </div>
-      <button class="btn btn-ghost btn-sm"><i data-lucide="external-link"></i> Ver</button>
-    </div>
-
-    <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 24px;">
-      <button class="btn btn-ghost" onclick="closeModal('modalPago')">Cancelar</button>
-      <button class="btn btn-ghost" style="color: var(--red); border-color: var(--red);" onclick="rechazarPago()"><i data-lucide="x"></i> Rechazar Váucher</button>
-      <button class="btn btn-green" onclick="aprobarPago()"><i data-lucide="check"></i> Váucher Conforme</button>
     </div>
   </div>
 </div>
@@ -423,12 +398,12 @@ textarea.form-input { resize: vertical; min-height: 80px; width: 100%; }
           </div>
         </div>
 
-        <div id="cajaObservacionDetalles" class="hidden" style="background: var(--red-bg); padding: 16px; border-radius: 8px; margin-top: 16px; border: 1px solid #FECACA;">
-          <label class="form-label" style="color: var(--red);">Motivo de subsanación</label>
+        <div id="cajaObservacionDetalles" class="hidden" style="background: var(--amber-bg); padding: 16px; border-radius: 8px; margin-top: 16px; border: 1px solid #FCD34D;">
+          <label class="form-label" style="color: var(--amber);">Motivo de la observación</label>
           <textarea id="txtObservacionDetalles" class="form-input" placeholder="Ej. El certificado no indica las horas cursadas."></textarea>
           <div style="display:flex; gap: 8px; margin-top: 10px; justify-content: flex-end;">
             <button class="btn btn-ghost btn-sm" onclick="toggleSubsanacionDetalles(false)">Cancelar</button>
-            <button class="btn btn-sm" style="background: var(--red); color: white;" onclick="confirmarSubsanacion()"><i data-lucide="send"></i> Enviar al alumno</button>
+            <button class="btn btn-sm" style="background: var(--amber); color: white;" onclick="confirmarSubsanacion()"><i data-lucide="send"></i> Enviar observación</button>
           </div>
         </div>
 
@@ -446,9 +421,9 @@ textarea.form-input { resize: vertical; min-height: 80px; width: 100%; }
     <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 24px; padding-top: 16px; border-top: 1px solid var(--border);">
       
       <div id="accionesFormatoContainer" style="display: flex; gap: 10px;">
-        <button class="btn btn-ghost" onclick="toggleSubsanacionDetalles(true)" style="color: var(--amber); border-color: var(--border);"><i data-lucide="alert-circle"></i> Solicitar Subsanación</button>
+        <button class="btn btn-ghost" onclick="toggleSubsanacionDetalles(true)" style="color: var(--amber); border-color: var(--border);"><i data-lucide="alert-circle"></i> Marcar como Observada</button>
         <button class="btn btn-red btn-sm" onclick="iniciarRechazo()"><i data-lucide="x-circle"></i> Rechazar</button>
-        <button class="btn btn-green" onclick="aprobarFormato()"><i data-lucide="check-circle"></i> Aprobar Formato</button>
+        <button class="btn btn-green" onclick="aprobarFormato()"><i data-lucide="check-circle"></i> Aprobar</button>
       </div>
 
       <div style="display: flex; gap: 10px; margin-left: auto;">
@@ -592,54 +567,131 @@ let solicitudes = [
     id: 'CLC-001', alumno: 'Eduardo Joao Sánchez Farías', carrera: 'Ingeniería Industrial y de Sistemas',
     actividad: 'Asociación Estudiantil CIMA', institucion: 'Universidad de Piura', tipo_actividad: 'Vida Universitaria', 
     evaluado: 'No', horas: 29, cl: 1, procedencia: 'interna',
-    estado: 'formato', archivo: 'Certificado CIMA 2024-I.pdf'
+    estado: 'revision', archivo: 'Certificado CIMA 2024-I.pdf'
   },
   {
-    id: 'CLC-002', alumno: 'Stiwar Andrés López Herrera', carrera: 'Ingeniería Mecánico Eléctrico',
+    id: 'CLC-002', alumno: 'Stiwar Andrés López Herrera', carrera: 'Ingeniería Industrial y de Sistemas',
     actividad: 'Machine Learning con Python', institucion: 'UNI', tipo_actividad: 'Cursos de extensión',
     evaluado: 'Sí', horas: 16, cl: 1, procedencia: 'externa',
-    estado: 'formato', archivo: 'Certificado Machine Learning con Python- UNI.pdf'
+    estado: 'revision', archivo: 'Certificado Machine Learning con Python- UNI.pdf'
   },
   {
     id: 'CLC-003', alumno: 'Peter Rodrigo Medina Castillo', carrera: 'Ingeniería Industrial y de Sistemas',
     actividad: 'Club de Excel Avanzado', institucion: 'Universidad de Piura', tipo_actividad: 'Arte y Cultura',
     evaluado: 'No', horas: 32, cl: 1, procedencia: 'interna',
-    estado: 'formato', archivo: 'Certificado_Excel_Avanzado_Club.pdf'
+    estado: 'observada', archivo: 'Certificado_Excel_Avanzado_Club.pdf',
+    motivoObservacion: 'El certificado no especifica el número de horas con claridad.'
   },
   {
-    id: 'CLC-004', alumno: 'Joaquín Alejandro Paredes Ruiz', carrera: 'Arquitectura',
+    id: 'CLC-004', alumno: 'Joaquín Alejandro Paredes Ruiz', carrera: 'Ingeniería Industrial y de Sistemas',
     actividad: 'Voluntariado de Construcción Solidaria', institucion: 'ONG TECHO', tipo_actividad: 'Vida Universitaria',
     evaluado: 'No', horas: 40, cl: 1, procedencia: 'externa',
-    estado: 'subsanacion', archivo: 'constancia_generica.pdf'
+    estado: 'aprobado', archivo: 'Constancia generica.pdf'
   },
   {
-    id: 'CLC-005', alumno: 'Samuel Ignacio Guerrero Távara', carrera: 'Ingeniería Civil',
+    id: 'CLC-005', alumno: 'Samuel Ignacio Guerrero Távara', carrera: 'Ingeniería Industrial y de Sistemas',
     actividad: 'Seminario de Construcción Antisísmica', institucion: 'SENCICO', tipo_actividad: 'Seminarios',
     evaluado: 'No', horas: 16, cl: 1, procedencia: 'externa',
-    estado: 'direccion', archivo: 'seminario.pdf'
+    estado: 'pago_pendiente', archivo: 'Constancia generica.pdf'
   },
   {
-    id: 'CLC-006', alumno: 'Fiorella Xiomara Mendoza Vásquez', carrera: 'Ingeniería de Software e Inteligencia Artificial',
+    id: 'CLC-006', alumno: 'Fiorella Xiomara Mendoza Vásquez', carrera: 'Ingeniería Industrial y de Sistemas',
     actividad: 'Certificación de Azure Fundamentals', institucion: 'Microsoft', tipo_actividad: 'Actividades externas',
     evaluado: 'Sí', horas: 32, cl: 1, procedencia: 'externa',
-    estado: 'pago_revision', archivo: 'cert_azure.pdf'
+    estado: 'siga', archivo: 'Constancia generica.pdf'
   },
   {
-    id: 'CLC-007', alumno: 'Camila Beatriz Ríos Salcedo', carrera: 'Arquitectura',
+    id: 'CLC-007', alumno: 'Camila Beatriz Ríos Salcedo', carrera: 'Ingeniería Industrial y de Sistemas',
     actividad: 'Curso de Diseño Digital Básico', institucion: 'Instituto Toulouse', tipo_actividad: 'Cursos de extensión',
     evaluado: 'No', horas: 8, cl: 0, procedencia: 'externa',
-    estado: 'rechazado', archivo: 'cert_toulouse.pdf',
+    estado: 'rechazado', archivo: 'Constancia generica.pdf',
     motivoRechazo: 'Horas insuficientes (8h < 32h mínimo para actividad sin nota).'
+  },
+  {
+    id: 'CLC-008', alumno: 'Fabiola Paola Montoya Aguilar', carrera: 'Ingeniería Industrial y de Sistemas',
+    actividad: 'Diplomado en Gestión de Proyectos', institucion: 'PMI Perú', tipo_actividad: 'Cursos de extensión',
+    evaluado: 'Sí', horas: 48, cl: 3, procedencia: 'externa',
+    estado: 'siga', archivo: 'Constancia generica.pdf'
+  },
+  {
+    id: 'CLC-009', alumno: 'Diego Alonso Arce Vallejos', carrera: 'Ingeniería Industrial y de Sistemas',
+    actividad: 'Congreso Nacional de Ingeniería Industrial', institucion: 'CIP', tipo_actividad: 'Congresos',
+    evaluado: 'No', horas: 32, cl: 1, procedencia: 'externa',
+    estado: 'pago_pendiente', archivo: 'Constancia generica.pdf'
+  },
+  {
+    id: 'CLC-010', alumno: 'Valeria Luciana Chumacero Pintado', carrera: 'Ingeniería Industrial y de Sistemas',
+    actividad: 'Voluntariado UDEP Solidaria', institucion: 'UDEP – Bienestar', tipo_actividad: 'Vida Universitaria',
+    evaluado: 'No', horas: 32, cl: 1, procedencia: 'interna',
+    estado: 'aprobado', archivo: 'Constancia generica.pdf'
+  },
+  {
+    id: 'CLC-011', alumno: 'Eduardo Joao Sánchez Farías', carrera: 'Ingeniería Industrial y de Sistemas',
+    actividad: 'Curso de Python para Ingenieros', institucion: 'Platzi', tipo_actividad: 'Cursos de extensión',
+    evaluado: 'Sí', horas: 16, cl: 1, procedencia: 'externa',
+    estado: 'siga', archivo: 'Constancia generica.pdf'
+  },
+  {
+    id: 'CLC-012', alumno: 'Stiwar Andrés López Herrera', carrera: 'Ingeniería Industrial y de Sistemas',
+    actividad: 'Taller de Oratoria y Liderazgo', institucion: 'Universidad de Piura', tipo_actividad: 'Vida Universitaria',
+    evaluado: 'No', horas: 16, cl: 0, procedencia: 'interna',
+    estado: 'observada', archivo: 'Constancia generica.pdf',
+    motivoObservacion: 'Falta la firma del responsable del taller en el certificado.'
+  },
+  {
+    id: 'CLC-013', alumno: 'Peter Rodrigo Medina Castillo', carrera: 'Ingeniería Industrial y de Sistemas',
+    actividad: 'Certificación AWS Cloud Practitioner', institucion: 'Amazon Web Services', tipo_actividad: 'Actividades externas',
+    evaluado: 'Sí', horas: 24, cl: 1, procedencia: 'externa',
+    estado: 'pago_pendiente', archivo: 'Constancia generica.pdf'
+  },
+  {
+    id: 'CLC-014', alumno: 'Samuel Ignacio Guerrero Távara', carrera: 'Ingeniería Industrial y de Sistemas',
+    actividad: 'Hackathon Universitario de Innovación', institucion: 'UDEP – Facultad de Ingeniería', tipo_actividad: 'Actividades y cursos de extensión',
+    evaluado: 'No', horas: 32, cl: 1, procedencia: 'interna',
+    estado: 'aprobado', archivo: 'Constancia generica.pdf'
+  },
+  {
+    id: 'CLC-015', alumno: 'Fiorella Xiomara Mendoza Vásquez', carrera: 'Ingeniería Industrial y de Sistemas',
+    actividad: 'Curso de Inglés Técnico Avanzado', institucion: 'Instituto Cultural Peruano Norteamericano', tipo_actividad: 'Cursos de extensión',
+    evaluado: 'No', horas: 12, cl: 0, procedencia: 'externa',
+    estado: 'rechazado', archivo: 'Constancia generica.pdf',
+    motivoRechazo: 'Horas insuficientes (12h < 32h mínimo para actividad sin nota).'
+  },
+  {
+    id: 'CLC-016', alumno: 'Joaquín Alejandro Paredes Ruiz', carrera: 'Ingeniería Industrial y de Sistemas',
+    actividad: 'Curso de Excel Financiero', institucion: 'Universidad de Piura', tipo_actividad: 'Cursos de extensión',
+    evaluado: 'Sí', horas: 16, cl: 1, procedencia: 'interna',
+    estado: 'revision', archivo: 'Constancia generica.pdf'
   }
 ];
 
 const estadosMap = {
-  'formato': { label: 'Documentos por Validar', badge: 'badge-blue' },
-  'pago_revision': { label: 'Espera de Pago', badge: 'badge-amber' },
-  'subsanacion': { label: 'Esperando Subsanación', badge: 'badge-red' },
-  'rechazado': { label: 'Rechazado', badge: 'badge-red' },
-  'direccion': { label: 'Aprobado', badge: 'badge-green' }
+  'revision':      { label: 'En Revisión',       badge: 'badge-blue' },
+  'observada':     { label: 'Observada',          badge: 'badge-amber' },
+  'aprobado':      { label: 'Aprobado',           badge: 'badge-green' },
+  'rechazado':     { label: 'Rechazado',          badge: 'badge-red' },
+  'pago_pendiente':{ label: 'Pendiente de Pago',  badge: 'badge-amber' },
+  'siga':          { label: 'Finalizado',         badge: 'badge-green' },
 };
+
+let sortEstadoAsc = null; // null = sin orden, true = asc, false = desc
+
+function toggleSortEstado() {
+  if (sortEstadoAsc === null || sortEstadoAsc === false) {
+    sortEstadoAsc = true;
+  } else {
+    sortEstadoAsc = false;
+  }
+  // Actualizar icono del botón
+  const btn = document.getElementById('btnSortEstado');
+  if (btn) {
+    btn.innerHTML = sortEstadoAsc
+      ? '<i data-lucide="arrow-up" style="width:12px;height:12px;"></i>'
+      : '<i data-lucide="arrow-down" style="width:12px;height:12px;"></i>';
+  }
+  renderTable();
+  lucide.createIcons();
+}
 
 let activeId = null;
 let currentFilteredList = []; 
@@ -658,36 +710,45 @@ function renderDashboard() {
 
 function renderStats() {
   const stats = {
-    total: solicitudes.length,
-    formato: solicitudes.filter(s => s.estado === 'formato').length,
-    subsanacion: solicitudes.filter(s => s.estado === 'subsanacion').length,
-    pago: solicitudes.filter(s => s.estado === 'pago_revision').length,
-    rechazados: solicitudes.filter(s => s.estado === 'rechazado').length,
-    aprobados: solicitudes.filter(s => s.estado === 'direccion').length
+    total:       solicitudes.length,
+    revision:    solicitudes.filter(s => s.estado === 'revision').length,
+    observada:   solicitudes.filter(s => s.estado === 'observada').length,
+    aprobado:    solicitudes.filter(s => s.estado === 'aprobado').length,
+    rechazados:  solicitudes.filter(s => s.estado === 'rechazado').length,
+    pago:        solicitudes.filter(s => s.estado === 'pago_pendiente').length,
+    siga:        solicitudes.filter(s => s.estado === 'siga').length,
   };
 
   document.getElementById('statsContainer').innerHTML = `
     <div class="stat-card"><div class="stat-label">Total Solicitudes</div><div class="stat-value">${stats.total}</div></div>
-    <div class="stat-card" style="border-left: 4px solid var(--udep-blue)"><div class="stat-label">Docs. por Validar</div><div class="stat-value">${stats.formato}</div></div>
-    <div class="stat-card" style="border-left: 4px solid var(--amber)"><div class="stat-label">Espera Subsanación</div><div class="stat-value">${stats.subsanacion}</div></div>
-    <div class="stat-card" style="border-left: 4px solid #D97706"><div class="stat-label">Espera de Pago</div><div class="stat-value">${stats.pago}</div></div>
-    <div class="stat-card" style="border-left: 4px solid var(--red)"><div class="stat-label">Rechazados</div><div class="stat-value">${stats.rechazados}</div></div>
-    <div class="stat-card" style="border-left: 4px solid var(--green)"><div class="stat-label">Aprobados</div><div class="stat-value">${stats.aprobados}</div></div>
+    <div class="stat-card" style="border-left: 4px solid var(--udep-blue)"><div class="stat-label">En Revisión</div><div class="stat-value">${stats.revision}</div></div>
+    <div class="stat-card" style="border-left: 4px solid var(--amber)"><div class="stat-label">Observadas</div><div class="stat-value">${stats.observada}</div></div>
+    <div class="stat-card" style="border-left: 4px solid #D97706"><div class="stat-label">Pend. de Pago</div><div class="stat-value">${stats.pago}</div></div>
+    <div class="stat-card" style="border-left: 4px solid var(--green)"><div class="stat-label">Aprobadas</div><div class="stat-value" style="color: var(--green);">${stats.aprobado}</div></div>
+    <div class="stat-card" style="border-left: 4px solid var(--red)"><div class="stat-label">Rechazadas</div><div class="stat-value">${stats.rechazados}</div></div>
+    <div class="stat-card" style="border-left: 4px solid var(--green)"><div class="stat-label">Finalizados</div><div class="stat-value">${stats.siga}</div></div>
   `;
 }
 
 function renderTable() {
   const tbody = document.getElementById('tableBody');
   const searchVal = document.getElementById('searchBox').value.toLowerCase();
-  const filterProg = document.getElementById('filterPrograma').value;
   const filterEst = document.getElementById('filterEstado').value;
 
   currentFilteredList = solicitudes.filter(s => {
     const matchSearch = s.alumno.toLowerCase().includes(searchVal) || s.id.toLowerCase().includes(searchVal);
-    const matchProg = (filterProg === 'Todos') || (s.carrera === filterProg);
     const matchEst = (filterEst === 'Todos') || (s.estado === filterEst);
-    return matchSearch && matchProg && matchEst;
+    return matchSearch && matchEst;
   });
+
+  // Aplicar orden si está activo
+  if (sortEstadoAsc !== null) {
+    currentFilteredList = [...currentFilteredList].sort((a, b) => {
+      const la = (estadosMap[a.estado]?.label || a.estado).toLowerCase();
+      const lb = (estadosMap[b.estado]?.label || b.estado).toLowerCase();
+      return sortEstadoAsc ? la.localeCompare(lb) : lb.localeCompare(la);
+    });
+  }
 
   // Guardamos un snapshot de los IDs para que la navegación siga funcionando
   // incluso si el estado de un elemento cambia en segundo plano.
@@ -700,18 +761,10 @@ function renderTable() {
 
   // Ocultar columna de Horas/CL en el HTML (Punto 2)
   tbody.innerHTML = currentFilteredList.map(s => {
-    let actionBtn = '';
-    
-    // Botones rápidos para acciones que no sean formato
-    if (s.estado === 'subsanacion') {
-      actionBtn = `<span style="font-size: 12px; color: var(--red);"></span>`;
-    } else if (s.estado === 'direccion') {
-      actionBtn = `<span style="font-size: 12px; color: var(--text-muted);"></span>`;
-    } else if (s.estado === 'pago_revision') {
-      actionBtn = ``; // Se eliminó el botón de Verificar Váucher
-    }
-
-    let detailsBtn = `<button class="btn btn-sm ${s.estado === 'formato' ? 'btn-primary' : 'btn-ghost'}" onclick="openModalDetalles('${s.id}')" title="Validar formulario y documento"><i data-lucide="${s.estado === 'formato' ? 'file-check' : 'layout-template'}"></i> ${s.estado === 'formato' ? 'Revisar Documento' : 'Detalles'}</button>`;
+    // Un único tipo de botón "Detalles" para todas las solicitudes.
+    // El estado "Pendiente de Pago" ya queda reflejado en el badge de Estado,
+    // indicando que está a la espera de que Secretaría apruebe o rechace el pago.
+    let detailsBtn = `<button class="btn btn-sm btn-ghost" onclick="openModalDetalles('${s.id}')" title="Ver detalles de la solicitud"><i data-lucide="layout-template"></i> Detalles</button>`;
 
     return `
       <tr>
@@ -719,7 +772,7 @@ function renderTable() {
         <td><strong>${s.alumno}</strong><br><span style="font-size: 11px; color: var(--text-muted)">${s.carrera}</span></td>
         <td>${s.actividad}</td>
         <td><span class="badge ${estadosMap[s.estado].badge}"><span class="dot"></span> ${estadosMap[s.estado].label}</span></td>
-        <td><div class="table-actions">${detailsBtn} ${actionBtn}</div></td>
+        <td><div class="table-actions">${detailsBtn}</div></td>
       </tr>
     `;
   }).join('');
@@ -768,7 +821,7 @@ function openModalDetalles(id) {
 
   // 6. Mostrar/Ocultar botones de acción según el estado
   const containerAcciones = document.getElementById('accionesFormatoContainer');
-  if(s.estado === 'formato') {
+  if(s.estado === 'revision') {
     containerAcciones.style.display = 'flex';
   } else {
     containerAcciones.style.display = 'none';
@@ -814,7 +867,7 @@ function toggleEditMode(forceState = null, checkEvent = true) {
     
     // Restaurar acciones si el estado es formato
     const s = solicitudes.find(x => x.id === activeId);
-    if(s && s.estado === 'formato') containerAcciones.style.display = 'flex';
+    if(s && s.estado === 'revision') containerAcciones.style.display = 'flex';
   }
 }
 
@@ -857,56 +910,36 @@ function toggleSubsanacionDetalles(show) {
 }
 
 function confirmarSubsanacion() {
-  const msg = document.getElementById('txtObservacionDetalles').value;
-  if(!msg) return showToast('Escribe el motivo de la subsanación', 'error');
+  const msg = document.getElementById('txtObservacionDetalles').value.trim();
+  if(!msg) return showToast('Escribe el motivo de la observación', 'error');
   
   const s = solicitudes.find(x => x.id === activeId);
-  s.estado = 'subsanacion';
+  s.estado = 'observada';
+  s.motivoObservacion = msg;
   
-  // Ocultar opciones de formato y mostrar actualización de la etiqueta (Punto 1)
+  // Ocultar opciones y actualizar etiqueta
   document.getElementById('accionesFormatoContainer').style.display = 'none';
   document.getElementById('cajaObservacionDetalles').classList.add('hidden');
-  document.getElementById('modalCurrentState').innerHTML = `<span class="badge badge-red"><span class="dot"></span> Esperando Subsanación</span>`;
+  document.getElementById('modalCurrentState').innerHTML = `<span class="badge badge-amber"><span class="dot"></span> Observada</span>`;
   
-  showToast(`Correo enviado a ${s.alumno} solicitando corrección.`, 'success');
-  // Se evita ejecutar renderDashboard() para no interrumpir el flujo del botón "Siguiente"
+  showToast(`Solicitud ${s.id} marcada como Observada. Motivo enviado a ${s.alumno}.`, 'success');
 }
 
 function aprobarFormato() {
   const s = solicitudes.find(x => x.id === activeId);
-  s.estado = 'direccion';
   
-  // Ocultar opciones de formato y mostrar actualización de la etiqueta (Punto 1)
-  document.getElementById('accionesFormatoContainer').style.display = 'none';
-  document.getElementById('modalCurrentState').innerHTML = `<span class="badge badge-green"><span class="dot"></span> Aprobado</span>`;
-  
-  showToast('Formato válido.', 'success');
-  // Se evita ejecutar renderDashboard() para no interrumpir el flujo del botón "Siguiente"
-}
-
-/* ─── LÓGICA DE PAGO ───────────────────────────────────────────────────────── */
-
-function openModalPago(id) {
-  activeId = id;
-  const s = solicitudes.find(x => x.id === id);
-  document.getElementById('pagAlumno').textContent = s.alumno;
-  document.getElementById('modalPago').classList.add('open');
-}
-
-function rechazarPago() {
-  const s = solicitudes.find(x => x.id === activeId);
-  s.estado = 'subsanacion'; 
-  closeModal('modalPago');
-  showToast('Váucher rechazado. Se notificó al alumno para que resuba el documento.', 'error');
-  // Al cerrar el modal se ejecuta renderDashboard automáticamente
-}
-
-function aprobarPago() {
-  const s = solicitudes.find(x => x.id === activeId);
-  s.estado = 'direccion'; 
-  closeModal('modalPago');
-  showToast('Pago validado correctamente. Solicitud Aprobada.', 'success');
-  // Al cerrar el modal se ejecuta renderDashboard automáticamente
+  if (s.procedencia === 'externa') {
+    // RF-09: actividad externa aprobada → Pendiente de Pago automáticamente
+    s.estado = 'pago_pendiente';
+    document.getElementById('accionesFormatoContainer').style.display = 'none';
+    document.getElementById('modalCurrentState').innerHTML = `<span class="badge badge-amber"><span class="dot"></span> Pendiente de Pago</span>`;
+    showToast('Solicitud aprobada. Derivada a Pago pendiente por ser actividad externa.', 'success');
+  } else {
+    s.estado = 'aprobado';
+    document.getElementById('accionesFormatoContainer').style.display = 'none';
+    document.getElementById('modalCurrentState').innerHTML = `<span class="badge badge-green"><span class="dot"></span> Aprobado</span>`;
+    showToast('Solicitud aprobada.', 'success');
+  }
 }
 
 /* ─── UTILIDADES ──────────────────────────────────────────────────────────── */
@@ -917,8 +950,6 @@ function closeModal(modalId) {
     document.getElementById('pdfViewer').src = '';
     // Solo cuando se cierra el modal grande es que aplicamos el refresco a la tabla de fondo
     renderDashboard(); 
-  } else if (modalId === 'modalPago') {
-    renderDashboard();
   }
 }
 
@@ -937,14 +968,14 @@ function showToast(msg, type = '') {
 /* ─── DATOS EXTENDIDOS DE ALUMNOS (DNI, EMAIL) ─────────────────── */
 const alumnosData = [
   { nombre: 'Eduardo Joao Sánchez Farías', dni: '72341856', email: 'eduardo.sanchez.f@alum.udep.edu.pe', carrera: 'Ingeniería Industrial y de Sistemas', clAcum: 2 },
-  { nombre: 'Stiwar Andrés López Herrera', dni: '70482931', email: 'stiwar.lopez.h@alum.udep.edu.pe', carrera: 'Ingeniería Mecánico Eléctrico', clAcum: 1 },
+  { nombre: 'Stiwar Andrés López Herrera', dni: '70482931', email: 'stiwar.lopez.h@alum.udep.edu.pe', carrera: 'Ingeniería Industrial y de Sistemas', clAcum: 1 },
   { nombre: 'Peter Rodrigo Medina Castillo', dni: '73512048', email: 'peter.medina.c@alum.udep.edu.pe', carrera: 'Ingeniería Industrial y de Sistemas', clAcum: 1 },
-  { nombre: 'Joaquín Alejandro Paredes Ruiz', dni: '74823617', email: 'joaquin.paredes.r@alum.udep.edu.pe', carrera: 'Arquitectura', clAcum: 0 },
-  { nombre: 'Samuel Ignacio Guerrero Távara', dni: '71934825', email: 'samuel.guerrero.t@alum.udep.edu.pe', carrera: 'Ingeniería Civil', clAcum: 1 },
-  { nombre: 'Fiorella Xiomara Mendoza Vásquez', dni: '75612034', email: 'fiorella.mendoza.v@alum.udep.edu.pe', carrera: 'Ingeniería de Software e Inteligencia Artificial', clAcum: 0 },
-  { nombre: 'Camila Beatriz Ríos Salcedo', dni: '76042815', email: 'camila.rios.s@alum.udep.edu.pe', carrera: 'Arquitectura', clAcum: 0 },
-  { nombre: 'Fabiola Paola Montoya Aguilar', dni: '73198246', email: 'fabiola.montoya.a@alum.udep.edu.pe', carrera: 'Ingeniería Civil', clAcum: 2 },
-  { nombre: 'Diego Alonso Arce Vallejos', dni: '74501923', email: 'diego.arce.v@alum.udep.edu.pe', carrera: 'Arquitectura', clAcum: 3 },
+  { nombre: 'Joaquín Alejandro Paredes Ruiz', dni: '74823617', email: 'joaquin.paredes.r@alum.udep.edu.pe', carrera: 'Ingeniería Industrial y de Sistemas', clAcum: 0 },
+  { nombre: 'Samuel Ignacio Guerrero Távara', dni: '71934825', email: 'samuel.guerrero.t@alum.udep.edu.pe', carrera: 'Ingeniería Industrial y de Sistemas', clAcum: 1 },
+  { nombre: 'Fiorella Xiomara Mendoza Vásquez', dni: '75612034', email: 'fiorella.mendoza.v@alum.udep.edu.pe', carrera: 'Ingeniería Industrial y de Sistemas', clAcum: 0 },
+  { nombre: 'Camila Beatriz Ríos Salcedo', dni: '76042815', email: 'camila.rios.s@alum.udep.edu.pe', carrera: 'Ingeniería Industrial y de Sistemas', clAcum: 0 },
+  { nombre: 'Fabiola Paola Montoya Aguilar', dni: '73198246', email: 'fabiola.montoya.a@alum.udep.edu.pe', carrera: 'Ingeniería Industrial y de Sistemas', clAcum: 2 },
+  { nombre: 'Diego Alonso Arce Vallejos', dni: '74501923', email: 'diego.arce.v@alum.udep.edu.pe', carrera: 'Ingeniería Industrial y de Sistemas', clAcum: 3 },
   { nombre: 'Valeria Luciana Chumacero Pintado', dni: '72836495', email: 'valeria.chumacero.p@alum.udep.edu.pe', carrera: 'Ingeniería Industrial y de Sistemas', clAcum: 1 },
 ];
 
@@ -994,15 +1025,27 @@ let addFileAttached = false;
 let addFileNameStore = '';
 
 function simulateAddUpload() {
-  // Simulate a file picker — in a real app this would open <input type="file">
-  const fakeName = 'certificado_' + (addSolicitudAlumno || 'alumno').split(' ')[0].toLowerCase() + '.pdf';
-  addFileAttached = true;
-  addFileNameStore = fakeName;
-  document.getElementById('addUploadZone').style.display = 'none';
-  const uploaded = document.getElementById('addFileUploaded');
-  uploaded.style.display = 'flex';
-  document.getElementById('addFileName').textContent = fakeName;
-  lucide.createIcons();
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = '.pdf,application/pdf';
+  input.onchange = function(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    if (file.type !== 'application/pdf' && !file.name.toLowerCase().endsWith('.pdf')) {
+      showToast('⚠ Solo se admiten archivos PDF', 'error'); return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      showToast('⚠ El archivo supera el límite de 5 MB', 'error'); return;
+    }
+    addFileAttached = true;
+    addFileNameStore = file.name;
+    document.getElementById('addUploadZone').style.display = 'none';
+    const uploaded = document.getElementById('addFileUploaded');
+    uploaded.style.display = 'flex';
+    document.getElementById('addFileName').textContent = file.name;
+    lucide.createIcons();
+  };
+  input.click();
 }
 
 function removeAddFile() {
@@ -1058,7 +1101,7 @@ function guardarSolicitudDirector() {
     horas: horas,
     cl: Math.floor(horas / divisor),
     procedencia: document.getElementById('addProcedencia').value,
-    estado: 'formato',
+    estado: 'revision',
     archivo: addFileAttached ? addFileNameStore : 'sin_certificado.pdf',
     agregadoPorDirector: true
   });
@@ -1093,7 +1136,6 @@ function confirmarRechazoFinal() {
   const s = solicitudes.find(x => x.id === activeId);
   s.estado = 'rechazado';
   s.motivoRechazo = [...checks, ...(otra ? ['Otra razón: ' + otra] : [])].join(' | ');
-  closeModal('modalConfirmRechazo');
   renderDashboard();
   showToast(`Solicitud ${activeId} rechazada.`, 'error');
 }
@@ -1118,7 +1160,7 @@ function cerrarSesion() {
   if (confirm('¿Estás seguro de que deseas cerrar sesión?')) {
     showToast('Sesión cerrada. Redirigiendo...', 'success');
     setTimeout(() => {
-      window.location.href = 'index.html.html';
+      window.location.href = 'index_html.html';
     }, 1200);
   }
 }

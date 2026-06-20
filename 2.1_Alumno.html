@@ -728,6 +728,7 @@ tr:hover td { background: var(--bg); }
                 <div class="form-group">
                   <label class="form-label">Institución organizadora</label>
                   <input type="text" class="form-input" id="fInstitucion" placeholder="Ej. CONCYTEC" oninput="validateForm()"/>
+                  <span class="form-error hidden" id="errInstitucion">Campo requerido</span>
                 </div>
               </div>
 
@@ -763,9 +764,16 @@ tr:hover td { background: var(--bg); }
                   <label class="form-label">Horas certificadas</label>
                   <input type="number" class="form-input" id="fHoras" min="1" placeholder="0" oninput="calcHorasLive(); validateForm()"/>
                   <span class="form-error hidden" id="errHoras">Ingrese una hora válida</span>
+                  <span class="form-hint" id="hintHoras" style="margin-top:4px;display:block">16h (evaluado con nota) = 1 CL</span>
                 </div>
               </div>
 
+            </div>
+
+            <!-- Upload certificado -->
+            <div id="alertaPago" class="alert alert-amber hidden" style="margin-bottom:16px">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px;flex-shrink:0"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+              <div><strong>Actividad externa:</strong> Si tu solicitud es aprobada, deberás realizar un pago de S/ 135.00 y adjuntar el comprobante para finalizar el proceso.</div>
             </div>
 
             <!-- Upload certificado -->
@@ -837,22 +845,6 @@ tr:hover td { background: var(--bg); }
                     <span>32 horas certificadas = <strong>1 CL</strong></span>
                   </div>
                 </div>
-              </div>
-            </div>
-
-            <!-- Flujo de estados -->
-            <div class="card">
-              <div class="card-header"><span class="card-title">Flujo de Aprobación</span></div>
-              <div style="display:flex;flex-direction:column;gap:8px;font-size:12px">
-                <div style="display:flex;gap:8px;align-items:center"><span style="width:20px;height:20px;border-radius:50%;background:var(--udep-blue);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;flex-shrink:0">1</span> Registro de solicitud</div>
-                <div style="width:1px;height:12px;background:var(--border);margin-left:10px"></div>
-                <div style="display:flex;gap:8px;align-items:center"><span style="width:20px;height:20px;border-radius:50%;background:var(--udep-blue);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;flex-shrink:0">2</span> Validación de formato</div>
-                <div style="width:1px;height:12px;background:var(--border);margin-left:10px"></div>
-                <div style="display:flex;gap:8px;align-items:center"><span style="width:20px;height:20px;border-radius:50%;background:var(--udep-blue);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;flex-shrink:0">3</span> Subsanación de errores</div>
-                <div style="width:1px;height:12px;background:var(--border);margin-left:10px"></div>
-                <div style="display:flex;gap:8px;align-items:center"><span style="width:20px;height:20px;border-radius:50%;background:var(--amber);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;flex-shrink:0">4</span> Pago (solo externas)</div>
-                <div style="width:1px;height:12px;background:var(--border);margin-left:10px"></div>
-                <div style="display:flex;gap:8px;align-items:center"><span style="width:20px;height:20px;border-radius:50%;background:var(--green);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;flex-shrink:0">5</span> Registro final en SIGA</div>
               </div>
             </div>
           </div>
@@ -967,7 +959,7 @@ let solicitudes = [
     institucion: 'IEEE Perú', tipo: 'congreso', modalidad: 'practica',
     horas: 32, cl: 1, procedencia: 'externa',
     fechaInicio: '2024-03-10', fechaFin: '2024-03-12',
-    estado: 'Aprobado', etapa: 5,
+    estado: 'Aprobado', etapa: 6,
     descripcion: 'Congreso organizado por IEEE Sección Perú.',
     archivo: 'cert_ieee_congreso.pdf',
     comprobante: null,
@@ -975,8 +967,10 @@ let solicitudes = [
     observacion: 'Documentación completa y válida.',
     auditLog: [
       { tipo: 'created', accion: 'Solicitud registrada', usuario: 'Eduardo Joao Sánchez Farías', fecha: '10/03/2024 09:15', detalle: 'Nueva solicitud enviada' },
-      { tipo: 'pending', accion: 'Validación de formato', usuario: 'Sistema', fecha: '11/03/2024 08:00', detalle: 'Validación automática OK' },
+      { tipo: 'pending', accion: 'En revisión', usuario: 'Secretaría', fecha: '11/03/2024 08:00', detalle: 'Revisando documentación' },
       { tipo: 'approved', accion: 'Aprobación académica', usuario: 'Dr. Pedro Vega', fecha: '12/03/2024 10:30', detalle: 'Documentación completa y válida.' },
+      { tipo: 'payment', accion: 'Pago confirmado', usuario: 'Caja UDEP', fecha: '13/03/2024 09:00', detalle: 'Pago S/ 135.00 verificado' },
+      { tipo: 'approved', accion: 'Finalizado', usuario: 'Sistema', fecha: '14/03/2024 08:00', detalle: 'Crédito registrado en SIGA' },
     ],
     chat: [
       { de: 'admin', nombre: 'Dr. Pedro Vega', texto: 'La documentación está en orden. Felicitaciones por participar en el congreso.', hora: '12/03 10:32' },
@@ -989,7 +983,7 @@ let solicitudes = [
     institucion: 'UDEP – Bienestar', tipo: 'vida_universitaria', modalidad: 'teorica',
     horas: 16, cl: 1, procedencia: 'interna',
     fechaInicio: '2024-04-01', fechaFin: '2024-04-05',
-    estado: 'En Revisión', etapa: 1,
+    estado: 'En Revisión', etapa: 2,
     descripcion: 'Taller semestral de liderazgo estudiantil.',
     archivo: 'constancia_liderazgo.pdf',
     comprobante: null,
@@ -997,7 +991,7 @@ let solicitudes = [
     observacion: '',
     auditLog: [
       { tipo: 'created', accion: 'Solicitud registrada', usuario: 'Eduardo Joao Sánchez Farías', fecha: '01/04/2024 08:45', detalle: 'Nueva solicitud enviada' },
-      { tipo: 'pending', accion: 'Validación de formato', usuario: 'Secretaría', fecha: '01/04/2024 14:00', detalle: 'En espera de revisión académica' },
+      { tipo: 'pending', accion: 'En revisión', usuario: 'Secretaría', fecha: '01/04/2024 14:00', detalle: 'En espera de revisión académica' },
     ],
     chat: [
       { de: 'admin', nombre: 'Secretaría', texto: 'Hemos recibido tu solicitud. Estamos validando el formato del certificado.', hora: '01/04 14:05' },
@@ -1009,7 +1003,7 @@ let solicitudes = [
     institucion: 'ONG EcoPerú', tipo: 'externos', modalidad: 'practica',
     horas: 64, cl: 2, procedencia: 'externa',
     fechaInicio: '2024-02-01', fechaFin: '2024-02-28',
-    estado: 'Pago pendiente', etapa: 3,
+    estado: 'Pago pendiente', etapa: 4,
     descripcion: 'Reforestación en zona de Piura.',
     archivo: 'vol_ecoperu.pdf',
     comprobante: null,
@@ -1017,8 +1011,9 @@ let solicitudes = [
     observacion: '',
     auditLog: [
       { tipo: 'created', accion: 'Solicitud registrada', usuario: 'Eduardo Joao Sánchez Farías', fecha: '02/02/2024 09:00', detalle: 'Nueva solicitud enviada' },
+      { tipo: 'pending', accion: 'En revisión', usuario: 'Secretaría', fecha: '03/02/2024 09:00', detalle: 'Revisando documentación' },
       { tipo: 'approved', accion: 'Aprobación académica', usuario: 'Dr. Pedro Vega', fecha: '10/02/2024 11:00', detalle: 'Actividad válida. Procede pago en caja.' },
-      { tipo: 'pending', accion: 'Pago pendiente', usuario: 'Sistema', fecha: '10/02/2024 11:01', detalle: 'Solicitud derivada a caja para pago S/ 135.00' },
+      { tipo: 'pending', accion: 'Pendiente de pago', usuario: 'Sistema', fecha: '10/02/2024 11:01', detalle: 'Solicitud derivada a caja para pago S/ 135.00' },
     ],
     chat: []
   },
@@ -1132,7 +1127,7 @@ function calcCreditosReal(horas, modalidad) {
 
 function getMisCL() {
   return solicitudes
-    .filter(s => s.alumno === 'Eduardo Joao Sánchez Farías' && s.estado === 'Aprobado')
+    .filter(s => s.alumno === 'Eduardo Joao Sánchez Farías' && ['Aprobado','Registro SIGA'].includes(s.estado))
     .reduce((sum, s) => sum + s.cl, 0);
 }
 
@@ -1141,8 +1136,8 @@ function getMisCL() {
 ═══════════════════════════════════════════════════════════ */
 function renderDashboard() {
   const misSolicitudes = solicitudes.filter(s => s.alumno === 'Eduardo Joao Sánchez Farías');
-  const aprobadas = misSolicitudes.filter(s => s.estado === 'Aprobado');
-  const enProceso = misSolicitudes.filter(s => !['Aprobado','Rechazado'].includes(s.estado));
+  const aprobadas = misSolicitudes.filter(s => ['Aprobado','Registro SIGA'].includes(s.estado));
+  const enProceso = misSolicitudes.filter(s => !['Aprobado','Rechazado','Registro SIGA'].includes(s.estado));
   const clAcum = getMisCL();
   const tope = currentUser.topeCreditos;
   const pct = Math.min(clAcum / tope, 1);
@@ -1207,7 +1202,7 @@ function renderRequestList(list) {
     lucide.createIcons(); return;
   }
   container.innerHTML = list.map(s => {
-    const steps = ['Registro','Validación Formato','Subsanación de errores','Pago','Registro SIGA'];
+    const steps = ['Registrada','En Revisión','Observada','Aprobado/Rechazado','Pend. de Pago','Finalizado'];
     // etapa 1 = registro completado, validación de formato en curso (active)
     // Para que el registro siempre aparezca verde (done) y la validación en azul (active) al menos
     const stepHTML = steps.map((label, i) => {
@@ -1235,7 +1230,6 @@ function renderRequestList(list) {
           <div style="font-size:12px;color:var(--text-muted);margin-top:2px">${s.institucion} · ${s.id}</div>
         </div>
         <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
-          ${badgeHTML(s.estado)}
           <span style="font-size:12px;font-family:'DM Mono',monospace;color:var(--udep-navy);font-weight:600">${s.cl} CL</span>
           <button class="btn btn-sm btn-ghost" onclick="openDetail('${s.id}')"><i data-lucide="eye"></i> Ver detalle</button>
         </div>
@@ -1363,7 +1357,7 @@ function quickAction(id, newEstado, observacion = '', esExcepcion = false) {
   const fecha = now.toLocaleDateString('es-PE', { day:'2-digit', month:'2-digit', year:'numeric' }) + ' ' +
     now.toLocaleTimeString('es-PE', { hour:'2-digit', minute:'2-digit' });
   s.estado = newEstado;
-  s.etapa  = newEstado === 'Aprobado' ? 5 : 1;
+  s.etapa  = newEstado === 'Aprobado' ? 4 : newEstado === 'Rechazado' ? 4 : 1;
   s.observacion = observacion || (newEstado === 'Aprobado' ? 'Aprobado por dirección.' : 'Rechazado por dirección.');
   s.auditLog = s.auditLog || [];
   s.auditLog.push({
@@ -1623,12 +1617,22 @@ function subirComprobante(id) {
   // 1. Creamos un selector de archivos invisible
   const input = document.createElement('input');
   input.type = 'file';
-  input.accept = '.pdf, image/jpeg, image/png'; // Acepta PDF, JPG y PNG
+  input.accept = '.pdf,application/pdf'; // RF-10: solo PDF
 
   // 2. Le decimos qué hacer cuando el usuario elija un archivo
   input.onchange = function(e) {
     const file = e.target.files[0];
-    if (!file) return; // Si el usuario cierra la ventana sin elegir nada, cancelamos
+    if (!file) return;
+
+    // RF-10: solo PDF, máx 5 MB
+    if (file.type !== 'application/pdf' && !file.name.toLowerCase().endsWith('.pdf')) {
+      showToast('⚠ Solo se admiten comprobantes en formato PDF', 'error');
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      showToast('⚠ El comprobante supera el límite de 5 MB', 'error');
+      return;
+    }
 
     // 3. Guardamos el nombre real del archivo seleccionado
     s.comprobante = file.name;
@@ -1729,6 +1733,10 @@ function resetForm() {
   document.getElementById('fileUploaded').classList.add('hidden');
   document.getElementById('uploadZone').classList.remove('hidden');
   document.getElementById('btnEnviar').disabled = true;
+  // Reset error states
+  document.getElementById('errInstitucion').classList.add('hidden');
+  document.getElementById('fInstitucion').classList.remove('error');
+  document.getElementById('hintHoras').textContent = '16h (evaluado con nota) = 1 CL';
   fileAttached = false;
 }
 
@@ -1766,16 +1774,21 @@ function calcHorasLive() {
   }
 }
 
-// Validación general del formulario
 function validateForm() {
   const nombre = document.getElementById('fNombre').value.trim();
+  const institucion = document.getElementById('fInstitucion').value.trim();
   const horas  = parseInt(document.getElementById('fHoras').value) || 0;
   const errNombre = document.getElementById('errNombre');
   const nombreInput = document.getElementById('fNombre');
+  const errInst = document.getElementById('errInstitucion');
+
+  // Institución requerida
+  errInst.classList.toggle('hidden', institucion.length > 0);
+  document.getElementById('fInstitucion').classList.toggle('error', institucion.length === 0);
 
   // RF-05: Duplicado
   const duplicado = nombre.length > 0 && solicitudes.find(s =>
-    s.alumno === currentUser.nombre && s.estado === 'Aprobado' &&
+    s.alumno === currentUser.nombre && ['Aprobado','Registro SIGA'].includes(s.estado) &&
     s.actividad.toLowerCase() === nombre.toLowerCase()
   );
   if (duplicado) {
@@ -1790,10 +1803,9 @@ function validateForm() {
     nombreInput.classList.toggle('error', nombre.length === 0);
   }
 
-  const valid = nombre.length > 0 && horas >= 1 && !duplicado;
   const clElegido = document.getElementById('fCLElegido').value;
   document.getElementById('errCL').classList.toggle('hidden', clElegido.length > 0);
-  document.getElementById('btnEnviar').disabled = !(nombre.length > 0 && horas >= 1 && !duplicado && clElegido.length > 0);
+  document.getElementById('btnEnviar').disabled = !(nombre.length > 0 && institucion.length > 0 && horas >= 1 && !duplicado && clElegido.length > 0);
   document.getElementById('errHoras').classList.toggle('hidden', horas >= 1);
   calcHorasLive();
 }
@@ -1839,7 +1851,7 @@ function submitForm() {
     cl:          Math.min(cl, Math.max(0, tope - acum)),
     procedencia: document.getElementById('fProcedencia').value,
     fechaInicio: '', fechaFin: '',
-    estado:      'En Revisión',
+    estado:      'Registrada',
     etapa:       1,
     descripcion: '',
     archivo:     fileAttached ? (document.querySelector('.uploaded-filename')?.textContent || buildFilename('certificado.pdf')) : 'sin_adjunto.pdf',
@@ -1852,7 +1864,7 @@ function submitForm() {
 
   solicitudes.push(nuevaSolicitud);
   // Notificación automática al alumno
-  notifications.unshift({ id: 'n' + Date.now(), text: `Tu solicitud <strong>${nuevaSolicitud.id}</strong> (${nombre}) fue enviada y está <strong>En Revisión</strong>.`, time: 'Ahora', unread: true, solicitudId: nuevaSolicitud.id });
+  notifications.unshift({ id: 'n' + Date.now(), text: `Tu solicitud <strong>${nuevaSolicitud.id}</strong> (${nombre}) fue <strong>Registrada</strong> exitosamente.`, time: 'Ahora', unread: true, solicitudId: nuevaSolicitud.id });
   updateNotifBadge();
   showToast('✓ Solicitud enviada correctamente', 'success');
   navigate('dashboard');
@@ -1987,15 +1999,18 @@ function tipoLabel(tipo) {
 function badgeHTML(estado) {
   const map = {
     'Aprobado':          'badge-green',
+    'Registrada':        'badge-gray',
     'En Revisión':       'badge-blue',
-    'Pago pendiente': 'badge-amber',
+    'Observada':         'badge-amber',
+    'Pago pendiente':    'badge-amber',
     'Rechazado':         'badge-red',
+    'Registro SIGA':     'badge-green',
     'Sí':                'badge-green',
     'No':                'badge-gray',
   };
   
   // Identificamos si es un estado principal
-  const esEstadoPrincipal = ['Aprobado', 'En Revisión', 'Pago pendiente', 'Rechazado'].includes(estado);
+  const esEstadoPrincipal = ['Aprobado', 'Registrada', 'En Revisión', 'Observada', 'Pago pendiente', 'Rechazado', 'Registro SIGA'].includes(estado);
   
   // Cambiamos "flex-start" por "center" para que todo quede en el medio
   const widthStyle = esEstadoPrincipal ? 'style="width: 135px; justify-content: center;"' : '';
@@ -2099,7 +2114,7 @@ function cerrarSesion() {
   if (confirm('¿Estás seguro de que deseas cerrar sesión?')) {
     showToast('Sesión cerrada. Redirigiendo...', 'success');
     setTimeout(() => {
-      window.location.href = 'index.html.html';
+      window.location.href = 'index_html.html';
     }, 1200); // El retraso de 1200ms permite que el usuario vea el mensaje verde antes de salir
   }
 }
